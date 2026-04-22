@@ -143,10 +143,10 @@ u_time_series = []
 
 while t <= T_total:
     step += 1
-    print('============================')
-    print('\ttime =', t)
-    print('\tstep =', step)
-    print('============================')
+    # print('============================')
+    # print('\ttime =', t)
+    # print('\tstep =', step)
+    # print('============================')
 
     solve(F == 0, p, bcs=bcs, solver_parameters=solver_parameters)
     # diego : sol_vec = np.array(p.vector().dat.data)
@@ -204,7 +204,7 @@ plt.grid(False, linestyle='--', linewidth=0.1, which='minor')
 
 # Displaying the plot
 plt.tight_layout()
-plt.savefig('src/DD/transient-DD-pressure.png')
+plt.savefig('../figures/DD/transient-DD-pressure.png')
 #plt.show()
 
 
@@ -225,4 +225,4 @@ plt.ylabel(r"Darcy velocity [m/s]")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("src/DD/transient-DD-velocity.png")
+plt.savefig("../figures/DD/transient-DD-velocity.png")

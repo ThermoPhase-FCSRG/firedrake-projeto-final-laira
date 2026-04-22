@@ -36,8 +36,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Mesh definition
-numel = 200
-L = 50.0
+numel = 100 # mudei de 200 para 100 (!!!)
+L = 200.0   # alterado de 50 para 200m para ver melhor a evolução da pressão
 mesh = IntervalMesh(numel, 0.0, L)
 
 # Function space
@@ -114,7 +114,7 @@ plt.grid(True)
 plt.legend()
 plt.ticklabel_format(style='plain', axis='y')
 plt.tight_layout()
-plt.savefig("src/DN/steady-DN-velocity.png")
+plt.savefig("../figures/DN/k=1e-16/estacionario/velocity.png")
 # """
 
 # =========================
@@ -153,7 +153,7 @@ ax.yaxis.get_offset_text().set_fontsize(10)
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("src/DN/steady-DN-velocity-comparison.png")
+plt.savefig("../figures/DN/k=1e-16/estacionario/velocity-comparison.png")
 
 
 
@@ -181,4 +181,4 @@ ax.ticklabel_format(useOffset=False, style='plain')
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("src/DN/steady-DN-pressure-comparison.png")
+plt.savefig("../figures/DN/k=1e-16/estacionario/pressure-comparison.png")

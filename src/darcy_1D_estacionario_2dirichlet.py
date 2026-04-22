@@ -37,8 +37,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Mesh definition
-numel = 200
-L = 50.0
+numel = 100 # mudei de 200 para 100 (!!!)
+L = 200.0   # alterado de 50 para 200m para ver melhor a evolução da pressão
 mesh = IntervalMesh(numel, 0.0, L)
 
 # Function space
@@ -117,7 +117,7 @@ plt.ylabel(r"$u$ [m/s]")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("src/DD/steady-DD-velocity.png")
+plt.savefig("../figures/DD/steady-DD-velocity.png")
 # """
 
 # =========================
@@ -178,7 +178,7 @@ plt.ylabel(r"$u$ [m/s]")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("src/DD/steady-DD-velocity-comparison.png")
+plt.savefig("../figures/DD/steady-DD-velocity-comparison.png")
 
 
 # """
@@ -190,7 +190,7 @@ plt.xlim(x_values.min(), x_values.max())
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("src/DD/steady-DD-pressure.png")
+plt.savefig("../figures/DD/steady-DD-pressure.png")
 # plt.show()
 # """
 
@@ -218,6 +218,6 @@ plt.xlim(x_values.min(), x_values.max())
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("src/DD/steady-DD-pressure-comparison.png")
+plt.savefig("../figures/DD/steady-DD-pressure-comparison.png")
 # plt.show()
 

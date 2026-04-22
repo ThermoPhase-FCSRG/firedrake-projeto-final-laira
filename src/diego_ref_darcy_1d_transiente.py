@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Mesh definition
-numel = 200
-L = 10.0
+numel = 100 # mudei de 200 para 100 (!!!)
+L = 200.0   # alterado de 50 para 200m para ver melhor a evolução da pressão
 x_left, x_right = 0.0, L
 mesh = IntervalMesh(numel, x_left, x_right)
 

@@ -41,8 +41,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Mesh definition
-numel = 200
-L = 50.0
+numel = 100 # mudei de 200 para 100 (!!!)
+L = 200.0   # alterado de 50 para 200m para ver melhor a evolução da pressão
 x_left, x_right = 0.0, L
 mesh = IntervalMesh(numel, x_left, x_right)
 
@@ -76,7 +76,10 @@ kappa = Constant(1.0e-16)    # =0.0101325 mD TESTE
 
 
 # Time parameters
-T_total = 4.147e7  # 480 days
+# T_total = 4.147e7  # 480 days
+# dt = T_total / 500.
+
+T_total = 480 * 24 * 3600  # days
 dt = T_total / 500.
 
 # Assigning the IC
@@ -127,10 +130,10 @@ p_values_deg1 = []
 psol_deg1 = Function(Vref)
 while t <= T_total:
     step += 1
-    print('============================')
-    print('\ttime =', t)
-    print('\tstep =', step)
-    print('============================')
+    # print('============================')
+    # print('\ttime =', t)
+    # print('\tstep =', step)
+    # print('============================')
 
     solve(F == 0, p, bcs=bcs, solver_parameters=solver_parameters)
     # diego : sol_vec = np.array(p.vector().dat.data)
@@ -167,7 +170,7 @@ fig = plt.figure(dpi=300, figsize=(8, 6))
 ax = plt.subplot(111)
 
 # Plotting the data
-steps_to_plot = [1, 10, 30, 60, 120, 360, 480]
+steps_to_plot = [1, 10, 30, 60, 120, 360, 480]  # steps to plot (corresponding to specific times)
 for i in steps_to_plot:
     ax.plot(x_values, p_values_deg1[i-1] / 1e3, label=('Day %i' % (i)))
 
@@ -189,7 +192,7 @@ plt.grid(False, linestyle='--', linewidth=0.1, which='minor')
 
 # Displaying the plot
 plt.tight_layout()
-plt.savefig('src/DN/TESTE-transient-DN-pressure.png')
+plt.savefig('../figures/DN/k=1e-16/transiente/480 dias e L=200 numel = 200  - pressure.png')
 #plt.show()
 
 
@@ -214,5 +217,5 @@ plt.grid(True)
 plt.legend()
 plt.ticklabel_format(style='plain', axis='y')
 plt.tight_layout()
-plt.savefig('src/DN/transient-DN-velocity.png')
+plt.savefig('../figures/DN/k=1e-16/transiente/480 dias e L=200 e numel = 200 - velocity.png')
 # plt.show()
