@@ -1,16 +1,15 @@
 """
-Trabalho Final — Disciplina: GA 033 - Elementos Finitos
-Tema: Escoamento monofásico compressível de gás ideal em meio poroso (1D)
+Escoamento monofásico compressível de gás hidrogenio em meio poroso (1D)
 Formulação variacional com Firedrake
 
 Descrição do problema: (estacionário)
 ----------------------
-Resolve-se o problema estacionário de escoamento monofásico de um gás ideal
+Resolve-se o problema estacionário de escoamento monofásico de um gás 
 em um meio poroso unidimensional, representando um reservatório de comprimento L.
 
 Admite-se que:
 - o meio é rígido (porosidade constante),
-- o gás é ideal (fator de compressibilidade Z = 1),
+- o gás é compressivel,
 - não há termo fonte,
 - efeitos gravitacionais são desprezados.
 
@@ -30,11 +29,15 @@ Condições de contorno:
 
 A discretização espacial é realizada pelo Método dos Elementos Finitos
 utilizando elementos de Lagrange contínuos (CG), 
+
+rodar com: python -m src.models.stationary.compressivel_DD_1D
 """
 
 from firedrake import *
 import numpy as np
 import matplotlib.pyplot as plt
+
+from src.utils.paths import FIGURES_SIM
 
 # Mesh definition
 numel = 100 # mudei de 200 para 100 (!!!)
@@ -117,8 +120,7 @@ plt.ylabel(r"$u$ [m/s]")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("../figures/DD/steady-DD-velocity.png")
-# """
+plt.savefig(FIGURES_SIM / "compressible-steady-DD-velocity.png")
 
 # =========================
 # Velocidade analítica
@@ -178,8 +180,7 @@ plt.ylabel(r"$u$ [m/s]")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("../figures/DD/steady-DD-velocity-comparison.png")
-
+plt.savefig(FIGURES_SIM / "compressible-steady-DD-velocity-comparison.png")
 
 # """
 plt.figure(dpi=300, figsize=(8, 6))
@@ -190,7 +191,7 @@ plt.xlim(x_values.min(), x_values.max())
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("../figures/DD/steady-DD-pressure.png")
+plt.savefig(FIGURES_SIM / "compressible-steady-DD-pressure.png")
 # plt.show()
 # """
 
@@ -218,6 +219,6 @@ plt.xlim(x_values.min(), x_values.max())
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("../figures/DD/steady-DD-pressure-comparison.png")
+plt.savefig(FIGURES_SIM / "compressible-steady-DD-pressure-comparison.png")
 # plt.show()
 
