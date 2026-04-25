@@ -103,11 +103,13 @@ T_const = 300.0  # temperatura fixa (por enquanto!!!)
 
 # =========================
 # Compressibility (gás ideal)
-def Z(p):
-    return 1.0
+# def Z(p):
+  #  return 1.0
 
-def fp(p):
-    return p / Z(p)
+z_field = Function(V, name="Compressibility")
+
+def fp(p): 
+    return p / z_field
 
 # =========================
 # Variational formulation (STEADY STATE)
@@ -128,15 +130,16 @@ solver_parameters = {
 max_iter = 20
 tol = 1e-6
 
-# inicializa viscosidade com valor constante (chute inicial)
+# inicializa com valor constante (chute inicial)
 mu_field.assign(0.94e-5)
+z_field.assign(1.0) # compressibilidade do gás ideal
 
 for k in range(max_iter):
     print(f"\n--- Iteração de Picard {k+1} ---")
 
     p_old = p.copy(deepcopy=True)     # guarda solução anterior
 
-    # resolve PDE com μ fixo (Newton entra aqui)
+    # resolve PDE com mu e z fixos (Newton entra aqui):
     solve(F == 0, p, bcs=bcs, solver_parameters=solver_parameters)
 
     # =========================
@@ -150,13 +153,27 @@ for k in range(max_iter):
         mu_interp([val, T_const])[0] for val in p_vals
     ])
 
+    # =========================
+    # Atualização de Z(P)
+    z_vals = np.array([
+        Z_interp([val, T_const])[0] for val in p_vals
+    ])
+
+    # =========================
+    # conferindo
+    # =========================
     print(f"mu_min = {mu_vals.min():.3e}")
     print(f"mu_max = {mu_vals.max():.3e}")
-    print(f"Δμ = {np.linalg.norm(mu_vals - mu_field.dat.data):.3e}")
+    print(f"delta mu = {np.linalg.norm(mu_vals - mu_field.dat.data):.3e}")
 
-    # atualiza campo no Firedrake
-    mu_field.dat.data[:] = mu_vals
-    
+    print(f"z_min = {z_vals.min():.3e}")
+    print(f"z_max = {z_vals.max():.3e}")
+
+    # =========================
+    # Atualização dos campos de mu e z para a próxima iteração
+    # =========================
+    mu_field.dat.data[:] = mu_vals     
+    z_field.dat.data[:] = z_vals
 
     # =========================
     # Critério de convergência
@@ -201,6 +218,24 @@ x_cells = x_cell.dat.data_ro.copy()
 x_values = mesh.coordinates.dat.data_ro # Pega os valores das coordenadas dos nós da malha.
 p_values = p.dat.data_ro / 1e3  # Pega os valores da pressão numérica e converte de Pa para kPa.
 
+
+
+# =========================
+# Solução analítica (Z = 1)
+# =========================
+
+pw = float(p_left)
+pr = float(p_right)
+
+# solução analítica em Pa
+p_analytical = np.sqrt(
+    pw**2 + (pr**2 - pw**2) * x_values / L
+)
+
+p_analytical = p_analytical / 1e3 # converter para kPa (igual ao numérico)
+
+
+
 # =========================
 # Plotting
 # =========================
@@ -228,3 +263,32 @@ plt.legend()
 plt.tight_layout()
 plt.savefig(FIGURES_SIM / "compressible-steady-DD-velocity-PICARD.png")
 
+# =========================
+# Plot da comparação entre numérico e analítico
+plt.figure(dpi=300, figsize=(8, 6))
+
+# solução numérica (com Z variável)
+plt.plot(
+    x_values,
+    p_values,
+    "o",
+    markersize=3,
+    label="FEM (Z variável)"
+)
+
+# solução analítica (Z = 1)
+plt.plot(
+    x_values,
+    p_analytical,
+    "-",
+    linewidth=2,
+    label="Analítica (Z = 1)"
+)
+
+plt.xlabel(r"$x$ [m]")
+plt.ylabel("Pressure [kPa]")
+plt.xlim(x_values.min(), x_values.max())
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.savefig(FIGURES_SIM / "comparison_Z_vs_ideal.png")
