@@ -65,6 +65,7 @@ p.assign(1.5e7)  # Define um valor inicial para o método de Newton começar a i
 # kappa = Constant(1.0e-18)
 kappa = Constant(1.0e-16)   # =0.0101325 mD TESTE (!!!)
 mu = Constant(0.94e-5)
+# mu = mu_interp(P_value)
 
 # Compressibility (gás ideal)
 def Z(p):
@@ -117,7 +118,7 @@ plt.ylabel(r"$u$ [m/s]")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "idealsteady-DD-velocity.png")
+plt.savefig(FIGURES_SIM / "ideal-steady-DD-velocity.png")
 # """
 
 # =========================

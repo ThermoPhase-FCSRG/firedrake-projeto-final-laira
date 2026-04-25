@@ -164,14 +164,11 @@ plt.savefig(FIGURES_SIM / "ideal-steady-DN-velocity-comparison.png")
 # =========================
 # """
 plt.figure(dpi=300, figsize=(8, 6))
-
 plt.plot(x_values, p_values, "o", markersize=3, label="FEM (CG1)")
 plt.plot(x_values, p_analytical, "-", linewidth=2, label="Solução analítica")
-
 plt.xlabel(r"$x$ [m]")
-plt.ylabel("Pressure [MPa]")
+plt.ylabel("Pressure [KPa]")
 plt.xlim(x_values.min(), x_values.max())
-
 # ESCALA BOA
 plt.ylim(19.9, 20.1)  # ajusta para perto de 20 MPa
 
