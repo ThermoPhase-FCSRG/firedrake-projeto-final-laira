@@ -1,69 +1,167 @@
 # Escoamento Monofásico Compressível em Meio Poroso (1D)
 **Método dos Elementos Finitos com Firedrake**
 
-Trabalho Final — **GA 033 – Elementos Finitos**
-
 ---
 
 ## Descrição
 
-Este projeto resolve numericamente o escoamento monofásico compressível de um **gás ideal** em um **meio poroso unidimensional**, utilizando o **Método dos Elementos Finitos (MEF)** e a biblioteca **Firedrake**.
+Este projeto resolve numericamente o escoamento monofásico compressível do gás hidrogênio em um **meio poroso unidimensional**, utilizando o **Método dos Elementos Finitos (MEF)** com a biblioteca **Firedrake**.
 
-São considerados dois casos:
-- **Problema transiente**
-- **Problema estacionário**
+O modelo considera propriedades termodinâmicas **variáveis com pressão e temperatura**, obtidas a partir de bibliotecas externas e interpoladas via tabelas pré-computadas.
 
-Hipóteses:
+---
+
+## Objetivos do Projeto
+
+- Resolver a equação de pressão para escoamento compressível em meio poroso;
+- Incorporar **viscosidade μ(P,T)**, **densidade rho(P,T)** e **fator de compressibilidade Z(P,T)**;
+- Construir e validar tabelas de propriedades termodinâmicas;
+- Avaliar o impacto de propriedades reais no comportamento do escoamento.
+
+---
+
+## Hipóteses
+
 - Meio poroso rígido (porosidade constante);
-- Gás ideal (\( Z = 1 \));
+- Escoamento monofásico (gás hidrogênio);
 - Ausência de termo fonte;
-- Efeitos gravitacionais desprezados.
+- Efeitos gravitacionais desprezados;
+- Temperatura constante (nesta etapa do projeto).
 
 ---
 
 ## Estrutura do Projeto
-- darcy_1D_estacionario.py
-- darcy_1D_transiente.py
-- diego_ref_darcy_1d_transiente.py  (script de referecia do professor)
-- test.py  (está em branco mesmo)
+firedrake-projeto-final-laira/
+│
+├── src/
+│ ├── models/         # Modelos PDE (Firedrake)
+│ │ ├── stationary/
+│ │ │ ├── dd_model.py # Dirichlet-Dirichlet
+│ │ │ ├── dn_model.py # Dirichlet-Neumann
+│ │ │
+│ │ ├── transient/
+│ │ ├── dd_model.py
+│ │ ├── dn_model.py
+│ │
+│ ├── properties/      # Propriedades termodinâmicas
+│ │ ├── coolprop.py
+│ │ ├── thermo.py
+│ │ ├── thermopack.py
+│ │
+│ ├── interpolation/    # Construção e uso das tabelas
+│ │ ├── grid.py         # malha (P,T)
+│ │ ├── build_tables.py # cálculo de Z, μ, ρ
+│ │ ├── interpolators.py # interpolação (SciPy)
+│ │
+│ ├── validation/ 
+│ │ ├── compare_interp.py # erro da interpolação
+│ │ ├── error_analysis.py  (falta criar)
+│ │
+│ ├── plotting/ 
+│ │ ├── plot_properties.py  (vazio)
+│ │ ├── plot_results.py     (falta criar)
+│ │
+│ ├── utils/
+│ | ├── constants.py          (vazio)
+│ | ├── paths.py
+│
+├── data/
+│ ├── tables/       # tabelas (Z, μ, ρ)
+│ ├── processed/            (vazio)
+│
+├── figures/
+│ ├── properties/
+│ ├── validation/
+│ ├── simulations/
+│
+├── README.md
+├── requirements.txt
+
+    
 
 ---
 
-## Problema Transiente
-Condições de contorno:
-- \( p(0,t) = p_w \)
+## Modelo Matemático
 
-Condições iniciais: 
-- \( p(x,0) = p_r \)
+A equação governante considerada é:
+
+\[
+\frac{k}{\mu} \nabla \cdot \left( \frac{p}{Z} \nabla p \right) = 0
+\]
+
+onde:
+- \( p \): pressão  
+- \( k \): permeabilidade  
+- \( \mu = \mu(P,T) \): viscosidade  
+- \( Z = Z(P,T) \): fator de compressibilidade  
+
+---
+
+## Propriedades Termodinâmicas
+
+As propriedades podem ser obtidas a partir de:
+
+- CoolProp  
+- thermo  
+- thermopack  
+
+e interpoladas a partir de tabelas bidimensionais:
+
+\[
+Z = Z(P,T), \quad \mu = \mu(P,T), \quad \rho = \rho(P,T)
+\]
+
+---
+
+## Interpolação
+
+- Tabelas construídas em uma malha (P,T)
+- Interpolação via SciPy
+
+---
+
+## Problemas Resolvidos
+
+## casos com condições de contorno Dirichlet-Dirichlet:
+
+Condições de contorno:
+
+- \( p(0) = p_w \)
+- \( p(L) = p_r \)
+
+---
+
+## casos com condições de contorno Dirichlet-Neumann:
+
+Condições:
+
+- Inicial: \( p(x,0) = p_r \)
+- Contorno: \( p(0,t) = p_w \)
+
+
+## Casos estacionários:
+
+Resolução:
+- Método de Newton (Firedrake)
+- Acoplamento não linear via **Iteração de Picard** para μ(P,T) e Z(P,T)
+
+
+## Casos transientes:
 
 Discretização:
-- Elementos Lagrange contínuos (CG), grau 1;
-- Euler implícito no tempo;
-- Problema não linear resolvido via Newton.
-
-Saída:
-compressible-flow-transiente.png
-
-
+- Elementos CG (grau 1)
+- Euler implícito no tempo
+- Sistema não linear resolvido via Newton
 ---
 
-## Problema Estacionário
-Condições de contorno:
-- \( p(0,t) = p_w \)
-- \( p(L,t) = p_r \)
+## Estratégia Numérica
 
-Saída:
-compressible-flow-steady-2dirichlet.png
+O acoplamento das propriedades é feito por:
 
-
----
-
-## Dependências
-
-- Python ≥ 3.9  
-- Firedrake  
-- NumPy  
-- Matplotlib  
+1. Assume μ e Z conhecidos
+2. Resolve a equação de pressão
+3. Atualiza μ(P,T) e Z(P,T)
+4. Repete até convergência
 
 ---
 
@@ -73,6 +171,4 @@ Ative o ambiente virtual do Firedrake:
 ```bash
 source ~/venv-firedrake/bin/activate
 
-Em seguida, com o ambiente ativado, execute:
-python compressible_flow_transient.py
-python compressible_flow_steady.py
+
