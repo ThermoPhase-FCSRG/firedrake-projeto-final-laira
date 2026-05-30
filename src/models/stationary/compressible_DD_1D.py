@@ -1,10 +1,6 @@
 """
 Descrição do problema: (estacionário)
 ----------------------
-Resolve-se o problema estacionário de escoamento monofásico de um gás 
-compressível (hidrogenio) em um meio poroso unidimensional, representando um reservatório de comprimento L.
-
-Formulação variacional com Firedrake
 
 Admite-se que:
 - o meio é rígido (porosidade constante),
@@ -16,36 +12,16 @@ A equação governante considerada é:
 
     (k/μ) ∂/∂x ( p ∂p/∂x ) = 0
 
-onde:
-    p   = pressão
-    φ   = porosidade
-    k   = permeabilidade
-    μ   = viscosidade do fluido
-
 Condições de contorno:
     p = p_w  na fronteira do poço injetor (x = 0)
     p = p_r  na fronteira do reservatório (x = L)
 
-A discretização espacial é realizada pelo Método dos Elementos Finitos
-utilizando elementos de Lagrange contínuos (CG), 
-
-Estratégia numérica:
--------------------
-- A equação continua sendo resolvida com Newton (internamente ao Firedrake)
-- A dependência μ(P) é tratada por um loop externo (Iteração de Picard)
-
-Ideia do acoplamento:
--------------------
-1. Assume μ conhecido
-2. Resolve a equação para p
-3. Atualiza μ = μ(p)
-4. Repete até convergir
 
 Importante:
 -----------
 Nesta versão:
-- Temperatura é constante
-- μ depende apenas de P (redução de complexidade)
+- mu depende de p e T (com T constante)
+- Z depende de p e T (com T constante) 
 
 rodar com: python -m src.models.stationary.compressivel_DD_1D
 """
@@ -83,6 +59,7 @@ bcs = [bc_left, bc_right]
 p = Function(V, name="Pressure")
 v = TestFunction(V)
 
+# =========================
 # Initial guess
 p.assign(1.5e7)  # Define um valor inicial para o método de Newton começar a iteração.
 
@@ -92,24 +69,16 @@ p.assign(1.5e7)  # Define um valor inicial para o método de Newton começar a i
 kappa = Constant(1.0e-16)   # =0.0101325 mD TESTE (!!!)
 # mu = Constant(0.94e-5)
 mu_field = Function(V, name="Viscosity")  
+T_const = 300.0  # temperatura fixa (por enquanto!!!)
+
+z_field = Function(V, name="Compressibility")   # Compressibility 
+
+def fp(p): 
+    return p / z_field
 
 # =========================
 # Interpoladores
 Z_interp, rho_interp, mu_interp = load_interpolators()
-
-T_const = 300.0  # temperatura fixa (por enquanto!!!)
-
-
-
-# =========================
-# Compressibility (gás ideal)
-# def Z(p):
-  #  return 1.0
-
-z_field = Function(V, name="Compressibility")
-
-def fp(p): 
-    return p / z_field
 
 # =========================
 # Variational formulation (STEADY STATE)
@@ -133,6 +102,7 @@ tol = 1e-6
 # inicializa com valor constante (chute inicial)
 mu_field.assign(0.94e-5)
 z_field.assign(1.0) # compressibilidade do gás ideal
+
 
 for k in range(max_iter):
     print(f"\n--- Iteração de Picard {k+1} ---")

@@ -20,12 +20,12 @@ R = 8.314        # J/mol·K  # constante dos gases
 # =========================
 
 def calculate_Z(P, T):
-    return eos.zfac(T, P, z_comp, phase=PHASE_GAS)
-
+    z= eos.zfac(T, P, z_comp, phase=PHASE_GAS)
+    return z[0]
 
 def molar_volume(P, T):
-    return eos.specific_volume(T, P, z_comp, phase=PHASE_GAS)
-
+    vm = eos.specific_volume(T, P, z_comp, phase=PHASE_GAS)
+    return vm[0]
 
 # =========================
 # DENSIDADE - DUAS FORMAS

@@ -26,7 +26,8 @@ O modelo considera propriedades termodinâmicas **variáveis com pressão e temp
 - Escoamento monofásico (gás hidrogênio);
 - Ausência de termo fonte;
 - Efeitos gravitacionais desprezados;
-- Temperatura constante (nesta etapa do projeto).
+- Temperatura constante 
+
 
 ---
 
