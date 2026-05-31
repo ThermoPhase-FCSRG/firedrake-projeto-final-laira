@@ -16,14 +16,11 @@ Condições de contorno:
     p = p_w  na fronteira do poço injetor (x = 0)
     p = p_r  na fronteira do reservatório (x = L)
 
-
-Importante:
------------
-Nesta versão:
+Nesta versão:  
 - mu depende de p e T (com T constante)
 - Z depende de p e T (com T constante) 
 
-rodar com: python -m src.models.stationary.compressivel_DD_1D
+rodar com: python -m src.models.stationary.compressible_DD_1D
 """
 
 from firedrake import *

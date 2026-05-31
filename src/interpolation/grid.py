@@ -1,3 +1,5 @@
+# grid.py
+
 import numpy as np
 
 def create_grid(): # criando uma grade de pontos para interpolação
