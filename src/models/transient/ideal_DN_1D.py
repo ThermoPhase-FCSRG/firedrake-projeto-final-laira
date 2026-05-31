@@ -40,7 +40,7 @@ from firedrake import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.utils.paths import FIGURES_SIM
+from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_DN
 
 # Mesh definition
 numel = 100 # mudei de 200 para 100 (!!!)
@@ -194,7 +194,7 @@ plt.grid(False, linestyle='--', linewidth=0.1, which='minor')
 
 # Displaying the plot
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "ideal-transient-DN-pressure.png")
+plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_DN / "ideal-transient-DN-pressure.png")
 #plt.show()
 
 
@@ -219,5 +219,5 @@ plt.grid(True)
 plt.legend()
 plt.ticklabel_format(style='plain', axis='y')
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "ideal-transient-DN-velocity.png")
+plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_DN / "ideal-transient-DN-velocity.png")
 # plt.show()

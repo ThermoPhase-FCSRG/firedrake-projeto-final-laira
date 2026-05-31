@@ -20,14 +20,14 @@ Nesta versão:
 - mu depende de p e T (com T constante)
 - Z depende de p e T (com T constante) 
 
-rodar com: python -m src.models.stationary.compressible_DD_1D
+rodar com: python -m src.models.steady.compressible_DD_1D
 """
 
 from firedrake import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.utils.paths import FIGURES_SIM
+from src.utils.paths import FIGURES_SIM_COMPRESSIBLE_STEADY_DD
 from src.interpolation.interpolators import load_interpolators 
 
 # =========================
@@ -216,7 +216,7 @@ plt.xlim(x_values.min(), x_values.max())
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "compressible-steady-DD-pressure-PICARD.png")
+plt.savefig(FIGURES_SIM_COMPRESSIBLE_STEADY_DD / "compressible-steady-DD-pressure-PICARD.png")
 # plt.show()
 
 # =========================
@@ -228,7 +228,7 @@ plt.ylabel(r"$u$ [m/s]")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "compressible-steady-DD-velocity-PICARD.png")
+plt.savefig(FIGURES_SIM_COMPRESSIBLE_STEADY_DD / "compressible-steady-DD-velocity-PICARD.png")
 
 # =========================
 # Plot da comparação entre numérico e analítico
@@ -258,4 +258,4 @@ plt.xlim(x_values.min(), x_values.max())
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "comparison_Z_vs_ideal.png")
+plt.savefig(FIGURES_SIM_COMPRESSIBLE_STEADY_DD / "comparison_Z_vs_ideal.png")

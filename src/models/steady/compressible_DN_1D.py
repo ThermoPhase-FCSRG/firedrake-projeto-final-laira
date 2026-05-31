@@ -34,7 +34,8 @@ utilizando elementos de Lagrange contínuos (CG),
 from firedrake import *
 import numpy as np
 import matplotlib.pyplot as plt
-from src.utils.paths import FIGURES_SIM
+
+from src.utils.paths import FIGURES_SIM_COMPRESSIBLE_STEADY_DN
 
 # Mesh definition
 numel = 100 # mudei de 200 para 100 (!!!)
@@ -115,7 +116,7 @@ plt.grid(True)
 plt.legend()
 plt.ticklabel_format(style='plain', axis='y')
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "ideal-steady-DN-velocity.png")
+plt.savefig(FIGURES_SIM_COMPRESSIBLE_STEADY_DN / "compressible-steady-DN-velocity.png")
 # """
 
 # =========================
@@ -154,8 +155,7 @@ ax.yaxis.get_offset_text().set_fontsize(10)
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "ideal-steady-DN-velocity-comparison.png")
-
+plt.savefig(FIGURES_SIM_COMPRESSIBLE_STEADY_DN / "compressible-steady-DN-velocity-comparison.png")
 
 
 
@@ -164,19 +164,21 @@ plt.savefig(FIGURES_SIM / "ideal-steady-DN-velocity-comparison.png")
 # =========================
 # """
 plt.figure(dpi=300, figsize=(8, 6))
+
 plt.plot(x_values, p_values, "o", markersize=3, label="FEM (CG1)")
 plt.plot(x_values, p_analytical, "-", linewidth=2, label="Solução analítica")
+
 plt.xlabel(r"$x$ [m]")
-plt.ylabel("Pressure [KPa]")
+plt.ylabel("Pressure [MPa]")
 plt.xlim(x_values.min(), x_values.max())
+
 # ESCALA BOA
 plt.ylim(19.9, 20.1)  # ajusta para perto de 20 MPa
 
 # REMOVE offset tipo +2e1
 ax = plt.gca()
 ax.ticklabel_format(useOffset=False, style='plain')
-
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "ideal-steady-DN-pressure-comparison.png")
+plt.savefig(FIGURES_SIM_COMPRESSIBLE_STEADY_DN / "compressible-steady-DN-pressure-comparison.png")

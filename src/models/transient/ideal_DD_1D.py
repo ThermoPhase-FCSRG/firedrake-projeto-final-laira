@@ -45,7 +45,7 @@ from firedrake import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.utils.paths import FIGURES_SIM
+from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_DD
 
 # Mesh definition
 numel = 100 # mudei de 200 para 100 (!!!)
@@ -206,7 +206,7 @@ plt.grid(False, linestyle='--', linewidth=0.1, which='minor')
 
 # Displaying the plot
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "ideal-transient-DD-pressure.png")
+plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_DD / "ideal-transient-DD-pressure.png")
     
 #plt.show()
 
@@ -228,4 +228,4 @@ plt.ylabel(r"Darcy velocity [m/s]")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig(FIGURES_SIM / "ideal-transient-DD-velocity.png")
+plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_DD / "ideal-transient-DD-velocity.png")
