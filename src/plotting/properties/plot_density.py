@@ -1,14 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-
+from src.utils.paths import FIGURES_PROP_DENSITY
 
 def plot_density_vs_pressure(model_function, T, model_name):
     """
     Gráfico densidade vs pressão (T fixa)
     """
-
-    os.makedirs("figures/density", exist_ok=True)
 
     pressures = np.linspace(1e5, 2e7, 50)
     pressures_MPa = pressures / 1e6
@@ -26,7 +23,7 @@ def plot_density_vs_pressure(model_function, T, model_name):
 
     plt.grid()
 
-    filename = f"figures/density/density_vs_P_{model_name}.png"
+    filename = FIGURES_PROP_DENSITY / f"density_vs_P_{model_name}.png"
     plt.savefig(filename, dpi=300)
 
     plt.close()
@@ -35,8 +32,6 @@ def plot_density_vs_temperature(model_function, P, model_name):
     """
     Gráfico densidade vs temperatura (P fixa)
     """
-
-    os.makedirs("figures/density", exist_ok=True)
 
     temperatures = np.linspace(200, 500, 50)
     densities = []
@@ -54,7 +49,7 @@ def plot_density_vs_temperature(model_function, P, model_name):
 
     plt.grid()
 
-    filename = f"figures/density/density_vs_T_{model_name}.png"
+    filename = FIGURES_PROP_DENSITY / f"density_vs_T_{model_name}.png"
     plt.savefig(filename, dpi=300)
 
     plt.close()    
@@ -64,8 +59,6 @@ def plot_density_vs_Z(model_density, model_Z, T, model_name):
     """
     Gráfico densidade vs Z (variando pressão)
     """
-
-    os.makedirs("figures/density", exist_ok=True)
 
     pressures = np.linspace(1e5, 2e7, 100)
 
@@ -89,7 +82,7 @@ def plot_density_vs_Z(model_density, model_Z, T, model_name):
 
     plt.grid()
 
-    filename = f"figures/density/density_vs_Z_{model_name}.png"
+    filename = FIGURES_PROP_DENSITY / f"density_vs_Z_{model_name}.png"
     plt.savefig(filename, dpi=300)
 
     plt.close()    
@@ -100,8 +93,6 @@ def plot_density_vs_pressure_comparison(models, T):
     """
     Compara densidade vs Pressão para múltiplos modelos (T fixa)
     """
-    os.makedirs("figures/density", exist_ok=True)
-
     pressures = np.linspace(1e5, 2e7, 100)
     pressures_MPa = pressures / 1e6
 
@@ -123,15 +114,13 @@ def plot_density_vs_pressure_comparison(models, T):
     plt.legend()
     plt.grid()
 
-    plt.savefig("figures/density/density_vs_P_comparison.png", dpi=300)
+    plt.savefig(FIGURES_PROP_DENSITY / "density_vs_P_comparison.png", dpi=300)
     plt.close()
 
 def plot_density_vs_temperature_comparison(models, P):
     """
     Compara densidade vs Temperatura para múltiplos modelos (P fixa)
     """
-    os.makedirs("figures/density", exist_ok=True)
-
     temperatures = np.linspace(200, 500, 100)
 
     plt.figure()
@@ -152,7 +141,7 @@ def plot_density_vs_temperature_comparison(models, P):
     plt.legend()
     plt.grid()
 
-    plt.savefig("figures/density/density_vs_T_comparison.png", dpi=300)
+    plt.savefig(FIGURES_PROP_DENSITY / "density_vs_T_comparison.png", dpi=300)
     plt.close()
 
 
@@ -161,8 +150,6 @@ def plot_density_vs_Z_comparison(density_models, Z_models, T):
     """
     Compara densidade vs Z para múltiplos modelos (T fixa)
     """
-
-    os.makedirs("figures/density", exist_ok=True)
 
     pressures = np.linspace(1e5, 2e7, 100)
 
@@ -194,7 +181,7 @@ def plot_density_vs_Z_comparison(density_models, Z_models, T):
     plt.grid()
 
     plt.savefig(
-        "figures/density/density_vs_Z_comparison.png",
+        FIGURES_PROP_DENSITY / "density_vs_Z_comparison.png",
         dpi=300
     )
     plt.close()

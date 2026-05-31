@@ -14,8 +14,17 @@ FIGURES_SIM = FIGURES_DIR / "simulations"
 FIGURES_PROP = FIGURES_DIR / "properties"
 FIGURES_VAL = FIGURES_DIR / "validation" 
 
+# propriedades
+FIGURES_PROP_DENSITY = FIGURES_PROP / "density"
+FIGURES_PROP_Z = FIGURES_PROP / "z"
+FIGURES_PROP_VISCOSITY = FIGURES_PROP / "viscosity"
+
 
 # garante que existem
 FIGURES_SIM.mkdir(parents=True, exist_ok=True)
 FIGURES_PROP.mkdir(parents=True, exist_ok=True)
 FIGURES_VAL.mkdir(parents=True, exist_ok=True)
+
+FIGURES_PROP_DENSITY.mkdir(parents=True, exist_ok=True)
+FIGURES_PROP_Z.mkdir(parents=True, exist_ok=True)
+FIGURES_PROP_VISCOSITY.mkdir(parents=True, exist_ok=True)

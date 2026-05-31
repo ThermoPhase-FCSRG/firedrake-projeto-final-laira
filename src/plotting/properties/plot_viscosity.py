@@ -1,14 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-
+from src.utils.paths import FIGURES_PROP_VISCOSITY
 
 def plot_viscosity_vs_pressure(model_function, T, model_name):
     """
     μ vs P (T fixa)
     """
-
-    os.makedirs("figures/viscosity", exist_ok=True)
 
     pressures = np.linspace(1e5, 2e7, 50)
     pressures_MPa = pressures / 1e6
@@ -27,7 +24,7 @@ def plot_viscosity_vs_pressure(model_function, T, model_name):
 
     plt.grid()
 
-    filename = f"figures/viscosity/viscosity_vs_P_{model_name}.png"
+    filename = FIGURES_PROP_VISCOSITY / f"viscosity_vs_P_{model_name}.png"
     plt.savefig(filename, dpi=300)
 
     plt.close()
@@ -37,8 +34,6 @@ def plot_viscosity_vs_temperature(model_function, P, model_name):
     """
     μ vs T (P fixa)
     """
-
-    os.makedirs("figures/viscosity", exist_ok=True)
 
     temperatures = np.linspace(200, 500, 50)
     viscosities = []
@@ -56,7 +51,7 @@ def plot_viscosity_vs_temperature(model_function, P, model_name):
 
     plt.grid()
 
-    filename = f"figures/viscosity/viscosity_vs_T_{model_name}.png"
+    filename = FIGURES_PROP_VISCOSITY / f"viscosity_vs_T_{model_name}.png"
     plt.savefig(filename, dpi=300)
 
     plt.close()
@@ -65,8 +60,6 @@ def plot_viscosity_vs_pressure_comparison(models, T):
     """
     Compara viscosidade vs pressão para múltiplos modelos (T fixa)
     """
-
-    os.makedirs("figures/viscosity", exist_ok=True)
 
     pressures = np.linspace(1e5, 2e7, 100)
     pressures_MPa = pressures / 1e6
@@ -104,7 +97,7 @@ def plot_viscosity_vs_pressure_comparison(models, T):
     plt.grid()
 
     plt.savefig(
-        "figures/viscosity/viscosity_vs_P_comparison.png",
+        FIGURES_PROP_VISCOSITY / "viscosity_vs_P_comparison.png",
         dpi=300
     )
 
@@ -115,8 +108,6 @@ def plot_viscosity_vs_temperature_comparison(models, P):
     """
     Compara viscosidade vs temperatura para múltiplos modelos (P fixa)
     """
-
-    os.makedirs("figures/viscosity", exist_ok=True)
 
     temperatures = np.linspace(200, 500, 100)
 
@@ -153,7 +144,7 @@ def plot_viscosity_vs_temperature_comparison(models, P):
     plt.grid()
 
     plt.savefig(
-        "figures/viscosity/viscosity_vs_T_comparison.png",
+        FIGURES_PROP_VISCOSITY / "viscosity_vs_T_comparison.png",
         dpi=300
     )
     plt.close()

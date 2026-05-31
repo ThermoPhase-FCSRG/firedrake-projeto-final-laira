@@ -6,16 +6,16 @@ from CoolProp.CoolProp import PropsSI
 R = 4124  # J/kg.K
 
 
-def Z(P, T):
+def calculate_Z(P, T):
     """
     Calcula o fator de compressibilidade Z.
     [Z] = adimensional
     """
-    rho = density(P, T)
+    rho = calculate_density(P, T)
     Z = P / (rho * R * T)
     return Z
 
-def density(P, T):
+def calculate_density(P, T):
     """  
     Calcula a densidade do hidrogênio
     [rho] = kg/m³  
@@ -25,7 +25,7 @@ def density(P, T):
     rho = PropsSI("D", "P", P, "T", T, "Hydrogen") 
     return rho
 
-def viscosity(P, T):
+def calculate_viscosity(P, T):
     """
     Calcula a viscosidade do hidrogênio
     [mu] = Pa·s
