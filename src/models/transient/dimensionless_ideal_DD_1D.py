@@ -157,6 +157,7 @@ while T <= T_total:
     solve(F == 0, p, bcs=bcs, solver_parameters=solver_parameters)
     
     # ===== Pós-processamento da velocidade (TRANSIENTE) =====
+    # OBSERVAÇÃO: NÃO ESTÁ ADMENSIONALIZADA AINDA
     u_expr = -(kappa / mu) * p.dx(0)
     u.project(u_expr)
 
