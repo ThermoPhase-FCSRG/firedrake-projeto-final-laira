@@ -251,7 +251,7 @@ steps_to_plot = [1, 5, 10, 20, 50, 100, 200]
 for step in steps_to_plot:
     ax.plot(
         x_values,
-        pressure_snapshots[step] / 1e3,
+        pressure_snapshots[step] / 1e6,  # convertendo para MPa
         label=f"Step {step}"
     )
 
@@ -262,7 +262,7 @@ ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 # Setting the xy-labels
 plt.xlabel(r'$x$ [m]')
-plt.ylabel(r'Pressure [kPa]')
+plt.ylabel(r'Pressure [MPa]')
 plt.xlim(x_values.min(), x_values.max())
 
 # Setting the grids in the figure
