@@ -93,8 +93,14 @@ f = Constant(0.0)            # source term
 # T_total = 30 * 24 * 3600  # 30 dias
 # dt = T_total / 200
 
-T_total = 180 * 24 * 3600  # 120 dias
-dt = T_total / 200
+# T_total = 120 * 24 * 3600  # 120 dias
+# dt = T_total / 200
+
+# T_total = 180 * 24 * 3600  # 180 dias
+# dt = T_total / 200
+
+T_total = 360 * 24 * 3600  # 360 dias
+dt = T_total / 360
 # ------------------
 
 # Assigning the IC
@@ -182,11 +188,11 @@ ax = plt.subplot(111)
 
 # Plotting the data
 # steps_to_plot = [1, 10, 30, 60, 120, 360, 480]
-steps_to_plot = [1, 5, 10, 20, 50, 100, 200]  
+steps_to_plot = [1, 5, 10, 20, 50, 100, 200, 300, 360]  
 
 
 for i in steps_to_plot:
-    ax.plot(x_values, p_values_deg1[i-1] / 1e3, label=('Time step %i' % (i)))
+    ax.plot(x_values, p_values_deg1[i-1] / 1e6, label=('Time step %i' % (i)))
 
 # Getting and setting the legend
 box = ax.get_position()
@@ -195,7 +201,7 @@ ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 # Setting the xy-labels
 plt.xlabel(r'$x$ [m]')
-plt.ylabel(r'Pressure [kPa]')
+plt.ylabel(r'Pressure [MPa]')
 plt.xlim(x_values.min(), x_values.max())
 
 # Setting the grids in the figure
