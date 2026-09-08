@@ -205,8 +205,11 @@ while T <= T_total:
     u_expr =  -p.dx(0)  # adimensionalized Darcy velocity
     u.project(u_expr)
 
-    u_vals = u.dat.data_ro.copy()
+    u_vals = u.dat.data_ro.copy()  # representa U adimensional 
     u_time_series.append(u_vals)
+
+    u_dimensional_vals = u_vals * u_c      # u = U * u_c
+    u_dimensional_time_series.append(u_dimensional_vals)
 
     sol_vec = p.dat.data_ro.copy()   # adimensionalized pressure (P)
     sol_values.append(sol_vec)
@@ -261,12 +264,13 @@ plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_DD / "cyclic-dimensionless-ideal-transie
 #plt.show()
 
 # ============================================================
-# Comparação: pressão adimensional x pressão dimensional
-# ============================================================
+# Comparação: 
+steps_to_compare = [1, 50, 100]
 
+
+# pressão adimensional x pressão dimensional 
 fig, ax = plt.subplots(dpi=300, figsize=(8, 6))
 
-steps_to_compare = [1, 50, 100]
 for i in steps_to_compare:
 
     # Pressão adimensional
@@ -299,7 +303,43 @@ fig.savefig(
     FIGURES_SIM_IDEAL_TRANSIENT_DD
     / "comparison-dimensionless-dimensional-pressure-cyclic-transient-DD.png"
 )
+# ----------------
+# velocidade adimensional x velocidade dimensional
 
+fig, ax = plt.subplots(dpi=300, figsize=(8, 6))
+
+for i in steps_to_compare:
+
+    # Velocidade adimensional
+    ax.plot(
+        x_cells,
+        u_time_series[i-1],
+        linewidth=2,
+        label=f"Adimensional: t = {i} dias"
+    )
+
+    # Velocidade dimensional convertida novamente para adimensional
+    ax.plot(
+        x_cells,
+        u_dimensional_time_series[i-1] / u_c,
+        linestyle="--",
+        linewidth=2,
+        label=f"Dimensional: t = {i} dias"
+    )
+
+ax.set_xlabel(r"$X$")
+ax.set_ylabel(r"$U = u/u_c$")
+ax.set_xlim(0, 1)
+
+ax.grid(True)
+ax.legend()
+
+fig.tight_layout()
+
+fig.savefig(
+    FIGURES_SIM_IDEAL_TRANSIENT_DD
+    / "comparison-dimensionless-dimensional-velocity-cyclic-transient-DD.png"
+)
 
 # =====================================================
 # plotting velocity profiles over time
