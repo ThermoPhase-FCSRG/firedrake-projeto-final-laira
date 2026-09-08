@@ -174,6 +174,7 @@ x_values = mesh.coordinates.dat.data_ro # Laira
 
 sol_values = []
 p_values_deg1 = []
+p_dimentional_values = []
 psol_deg1 = Function(Vref)
 
 # ===== Espaço para velocidade de Darcy =====
@@ -186,8 +187,8 @@ x_cell = Function(V_u)
 x_cell.project(x[0])
 x_cells = x_cell.dat.data_ro.copy()
 
-# Lista para guardar velocidade ao longo do tempo
-u_time_series = []
+u_time_series = [] # Lista para guardar velocidade ao longo do tempo
+
 
 while T <= T_total:
     step += 1
@@ -196,15 +197,18 @@ while T <= T_total:
     solve(F == 0, p, bcs=bcs, solver_parameters=solver_parameters)
     
     # ===== Pós-processamento da velocidade (TRANSIENTE) =====
-    # OBSERVAÇÃO: NÃO ESTÁ ADMENSIONALIZADA AINDA
-    u_expr = -(kappa / mu) * p.dx(0)
+    # u_expr = -(kappa / mu) * p.dx(0)    # OBSERVAÇÃO: NÃO ESTÁ ADMENSIONALIZADA AINDA
+    u_expr =  -p.dx(0)  # adimensionalized Darcy velocity
     u.project(u_expr)
 
     u_vals = u.dat.data_ro.copy()
     u_time_series.append(u_vals)
 
-    sol_vec = p.dat.data_ro.copy()
+    sol_vec = p.dat.data_ro.copy()   # adimensionalized pressure (P)
     sol_values.append(sol_vec)
+
+    p_dimentional_vec = sol_vec * p_c  # dimensionalized pressure   (p = P *pc)
+    p_dimentional_values.append(p_dimentional_vec)
 
     psol_deg1.project(p)
     p_vec_deg1 = psol_deg1.dat.data_ro.copy()
@@ -252,22 +256,68 @@ plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_DD / "cyclic-dimensionless-ideal-transie
     
 #plt.show()
 
+# ============================================================
+# Comparação: pressão adimensional x pressão dimensional
+# ============================================================
 
+fig, ax = plt.subplots(dpi=300, figsize=(8, 6))
+
+steps_to_compare = [1, 50, 100]
+for i in steps_to_compare:
+
+    # Pressão adimensional
+    ax.plot(
+        x_values,
+        sol_values[i-1],
+        linewidth=2,
+        label=f"Adimensional: t = {i} dias"
+    )
+
+    # Pressão dimensional convertida novamente para adimensional
+    ax.plot(
+        x_values,
+        p_dimentional_values[i-1] / p_c,
+        linestyle="--",
+        linewidth=2,
+        label=f"Dimensional: t = {i} dias"
+    )
+
+ax.set_xlabel(r"$X$")
+ax.set_ylabel(r"Pressure / $p_c$")
+ax.set_xlim(0, 1)
+
+ax.grid(True)
+ax.legend()
+
+fig.tight_layout()
+
+fig.savefig(
+    FIGURES_SIM_IDEAL_TRANSIENT_DD
+    / "comparison-dimensionless-dimensional-pressure-cyclic-transient-DD.png"
+)
+
+
+# =====================================================
 # plotting velocity profiles over time
-plt.figure(dpi=300, figsize=(8, 6))
+fig, ax = plt.subplots(dpi=300, figsize=(8, 6))
 
 for i in steps_to_plot:
-    plt.step(
+    ax.step(
         x_cells,
         u_time_series[i-1],
         where="mid",
         linewidth=2,
-        label=f"Day {i}"
+        label=f"t = {i} days"
     )
 
-plt.xlabel(r"$x$ [m]")
-plt.ylabel(r"Darcy velocity [m/s]")
-plt.grid(True)
-plt.legend()
-plt.tight_layout()
-plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_DD / "cyclic-dimensionless-ideal-transient-DD-velocity.png")
+ax.set_xlabel(r"$X$")
+ax.set_ylabel(r"Dimensionless Darcy velocity, $U$")
+ax.set_xlim(0, 1)
+ax.grid(True)
+ax.legend()
+
+fig.tight_layout()
+fig.savefig(
+    FIGURES_SIM_IDEAL_TRANSIENT_DD
+    / "cyclic-dimensionless-ideal-transient-DD-velocity.png"
+)
