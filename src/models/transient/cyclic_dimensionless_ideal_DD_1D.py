@@ -188,6 +188,10 @@ x_cell.project(x[0])
 x_cells = x_cell.dat.data_ro.copy()
 
 u_time_series = [] # Lista para guardar velocidade ao longo do tempo
+u_dimensional_time_series = [] # Lista para guardar velocidade dimensional ao longo do tempo
+
+u_c = float(kappa) * p_c / (float(mu) * L)
+print("Characteristic velocity =", u_c, "m/s")
 
 
 while T <= T_total:
