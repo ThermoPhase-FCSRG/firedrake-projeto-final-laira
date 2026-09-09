@@ -25,8 +25,14 @@ onde:
     μ   = viscosidade do fluido
 
 Condições de contorno:
-    p = p_w  na fronteira do poço injetor (x = 0)
-    p = p_r  na fronteira do reservatório (x = L)
+    Condição de Robin na fronteira do poço injetor (x = 0):
+        U · n = Gamma (P - P_w)
+
+    Condição de Dirichlet na fronteira de produção (x = L):
+        P = P_r
+
+    A condição de Robin está sendo implementada inicialmente apenas
+    durante a etapa de injeção.
 
 Condição inicial:
     p(x, 0) = p_r,  ∀ x ∈ Ω
@@ -36,16 +42,12 @@ utilizando elementos de Lagrange contínuos (CG),
 e a discretização temporal é feita via esquema implícito de Euler.
 """
 
-"""
-TESTANDO COM 2 COND DE CONTORNO DIRICHLET NO PROBLEMA TRANSIENTE
-"""
-
 # Importing libraries
 from firedrake import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_DD
+from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
 
 # Mesh definition
 numel = 100 # mudei de 200 para 100 (!!!)
@@ -61,11 +63,7 @@ Vref = FunctionSpace(mesh, "CG", 1)
 # Boundary condition (Dirichlet) and Initial condition
 # boundary_value_left = 2e7
 boundary_value_left = 2.0  # valor adimensionalizado
-bc_left = DirichletBC(V, boundary_value_left, 1)  # Boundary condition in 1 marked bounds (left)
-# boundary_value_right = 1e7
 boundary_value_right = 1.0  # valor adimensionalizado
-bc_right = DirichletBC(V, boundary_value_right, 2)
-# bcs = [bc_left, bc_right]
 
 # ic = Constant(1e7)
 ic = Constant(1.0)  # valor adimensionalizado
@@ -74,6 +72,11 @@ ic = Constant(1.0)  # valor adimensionalizado
 p = Function(V)
 p_k = Function(V)
 v = TestFunction(V)
+
+p_injection_left = Constant(2.0)
+p_reservoir = Constant(1.0)
+p_production_right = Constant(1.0)
+
 
 # Physical parameters
 phi = Constant(0.15)        # porosity
@@ -126,10 +129,10 @@ def hydraulic_bcs(T):
     mode = operation_mode(T)
 
     # Injection at x=0, cyclic operation
+    # a função hydraulic_bcs deixa de ser responsável pela condição Robin, 
+    # porque Robin entra diretamente no residual variacional.
     if mode == "injection":
-        return [
-            DirichletBC(V, boundary_value_left, 1)
-        ]
+        return []
 
     elif mode == "stop":
         return []
@@ -138,6 +141,30 @@ def hydraulic_bcs(T):
         return [
             DirichletBC(V, boundary_value_right, 2)
         ]
+
+# ----------------
+# Parâmetro adimensional da condição de Robin
+Gamma_open = Constant(1000.0)
+
+Gamma_left = Constant(0.0)
+Gamma_right = Constant(0.0)
+
+
+# -----------------
+def update_well_pressures(T):
+    mode = operation_mode(T)
+
+    if mode == "injection":
+        Gamma_left.assign(Gamma_open)
+        Gamma_right.assign(0.0)
+
+    elif mode == "stop":
+        Gamma_left.assign(0.0)
+        Gamma_right.assign(0.0)
+
+    elif mode == "production":
+        Gamma_left.assign(0.0)
+        Gamma_right.assign(Gamma_open)
 
 
 # ------------------
@@ -158,6 +185,7 @@ def fp(p):
 # Residual variational formulation
 F = inner((p - p_k) / dT, v) * dx + inner(p * grad(p), grad(v)) * dx
 F -= f * v * dx
+F += Gamma_left * p * (p - p_injection_left) * v * ds(1)   # Robin condition at x=0
 
 
 # Solver parameters
@@ -197,14 +225,51 @@ print("Characteristic velocity =", u_c, "m/s")
 while T <= T_total:
     step += 1
     mode = operation_mode(T)
+
+    update_well_pressures(T)
     bcs = hydraulic_bcs(T)
     solve(F == 0, p, bcs=bcs, solver_parameters=solver_parameters)
     
+
+    print(
+    f"day={step:3d}, mode={operation_mode(T)}, "
+    f"P_left={p.dat.data_ro[0]:.6f}, "
+    f"P_right={p.dat.data_ro[-1]:.6f}"
+)
+
+
+
+
+
+
     # ===== Pós-processamento da velocidade (TRANSIENTE) =====
     # u_expr = -(kappa / mu) * p.dx(0)    # OBSERVAÇÃO: NÃO ESTÁ ADMENSIONALIZADA AINDA
     u_expr =  -p.dx(0)  # adimensionalized Darcy velocity
     u.project(u_expr)
 
+
+    # -----
+    # teste
+    if operation_mode(T) == "injection":
+        dPdx = Function(V_u)
+        dPdx.project(p.dx(0))
+
+        dPdx_left = dPdx.dat.data_ro[0]
+
+        P_left = p.dat.data_ro[0]
+
+        robin_left = float(Gamma_left) * (
+            P_left - float(p_injection_left)
+        )
+
+        print(
+            f"Robin left: "
+            f"P_x={dPdx_left:.6f}, "
+            f"Gamma(P-Pw)={robin_left:.6f}, "
+            f"erro={dPdx_left - robin_left:.2e}"
+        )
+
+    # -----
     u_vals = u.dat.data_ro.copy()  # representa U adimensional 
     u_time_series.append(u_vals)
 
@@ -259,7 +324,7 @@ plt.grid(False, linestyle='--', linewidth=0.1, which='minor')
 
 # Displaying the plot
 plt.tight_layout()
-plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_DD / "cyclic-dimensionless-ideal-transient-DD-pressure.png")
+plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_ROBIN / "cyclic-dimensionless-ideal-transient-robin-pressure.png")
     
 #plt.show()
 
@@ -300,8 +365,8 @@ ax.legend()
 fig.tight_layout()
 
 fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_DD
-    / "comparison-dimensionless-dimensional-pressure-cyclic-transient-DD.png"
+    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
+    / "comparison-dimensionless-dimensional-pressure-cyclic-transient-robin.png"
 )
 # ----------------
 # velocidade adimensional x velocidade dimensional
@@ -337,8 +402,8 @@ ax.legend()
 fig.tight_layout()
 
 fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_DD
-    / "comparison-dimensionless-dimensional-velocity-cyclic-transient-DD.png"
+    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
+    / "comparison-dimensionless-dimensional-velocity-cyclic-transient-robin.png"
 )
 
 # =====================================================
@@ -362,6 +427,6 @@ ax.legend()
 
 fig.tight_layout()
 fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_DD
-    / "cyclic-dimensionless-ideal-transient-DD-velocity.png"
+    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
+    / "cyclic-dimensionless-ideal-transient-robin-velocity.png"
 )
