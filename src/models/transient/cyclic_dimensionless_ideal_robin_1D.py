@@ -138,13 +138,11 @@ def hydraulic_bcs(T):
         return []
 
     elif mode == "production":
-        return [
-            DirichletBC(V, boundary_value_right, 2)
-        ]
+        return []
 
 # ----------------
 # Parâmetro adimensional da condição de Robin
-Gamma_open = Constant(1000.0)
+Gamma_open = Constant(100.0)
 
 Gamma_left = Constant(0.0)
 Gamma_right = Constant(0.0)
@@ -186,7 +184,7 @@ def fp(p):
 F = inner((p - p_k) / dT, v) * dx + inner(p * grad(p), grad(v)) * dx
 F -= f * v * dx
 F += Gamma_left * p * (p - p_injection_left) * v * ds(1)   # Robin condition at x=0
-
+F += Gamma_right * p * (p - p_production_right) * v * ds(2)  # Robin condition at x=L
 
 # Solver parameters
 solver_parameters = {
@@ -250,6 +248,7 @@ while T <= T_total:
 
     # -----
     # teste
+    """
     if operation_mode(T) == "injection":
         dPdx = Function(V_u)
         dPdx.project(p.dx(0))
@@ -268,6 +267,24 @@ while T <= T_total:
             f"Gamma(P-Pw)={robin_left:.6f}, "
             f"erro={dPdx_left - robin_left:.2e}"
         )
+    """
+    if operation_mode(T) == "production":
+        dPdx = Function(V_u)
+        dPdx.project(p.dx(0))
+        dPdx_right = dPdx.dat.data_ro[-1]
+        P_right = p.dat.data_ro[-1]
+
+        robin_right = float(Gamma_right) * (
+            P_right - float(p_production_right)
+        )
+
+        print(
+            f"Robin right: "
+            f"-P_x={-dPdx_right:.6f}, "
+            f"Gamma(P-Pw)={robin_right:.6f}, "
+            f"erro={-dPdx_right - robin_right:.2e}"
+        )
+
 
     # -----
     u_vals = u.dat.data_ro.copy()  # representa U adimensional 
