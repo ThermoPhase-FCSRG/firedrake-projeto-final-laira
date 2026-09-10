@@ -25,14 +25,8 @@ onde:
     μ   = viscosidade do fluido
 
 Condições de contorno:
-    Condição de Robin na fronteira do poço injetor (x = 0):
+    Condição de Robin na fronteira do poço injetor e produtor:
         U · n = Gamma (P - P_w)
-
-    Condição de Dirichlet na fronteira de produção (x = L):
-        P = P_r
-
-    A condição de Robin está sendo implementada inicialmente apenas
-    durante a etapa de injeção.
 
 Condição inicial:
     p(x, 0) = p_r,  ∀ x ∈ Ω
@@ -60,11 +54,7 @@ degree = 1  # Polynomial degree of approximation
 V = FunctionSpace(mesh, "CG", degree)
 Vref = FunctionSpace(mesh, "CG", 1)
 
-# Boundary condition (Dirichlet) and Initial condition
-# boundary_value_left = 2e7
-boundary_value_left = 2.0  # valor adimensionalizado
-boundary_value_right = 1.0  # valor adimensionalizado
-
+# Initial condition
 # ic = Constant(1e7)
 ic = Constant(1.0)  # valor adimensionalizado
 
@@ -74,7 +64,6 @@ p_k = Function(V)
 v = TestFunction(V)
 
 p_injection_left = Constant(2.0)
-p_reservoir = Constant(1.0)
 p_production_right = Constant(1.0)
 
 
@@ -96,12 +85,6 @@ print("Characteristic time =", t_c / (24*3600), "days")
 
 # ------------------
 # Time parameters
-# t_total = 4.147e7  # 480 days
-# dt = t_total / 500.
-
-# t_total = 2 * 24 * 3600   # 2 dias em segundos
-# dt = t_total / 200        # passos menores para ver a evolução
-
 numero_de_dias = 360
 t_total = numero_de_dias * 24 * 3600  # physical total time =  360 days
 T_total = t_total / t_c  # adimensional total time
@@ -125,24 +108,9 @@ for day in [0, 10, 30, 40, 60, 70, 90, 100, 120, 130, 150, 160, 180, 200, 300, 3
     print(day, operation_mode(T_test))
 
 
-def hydraulic_bcs(T):
-    mode = operation_mode(T)
-
-    # Injection at x=0, cyclic operation
-    # a função hydraulic_bcs deixa de ser responsável pela condição Robin, 
-    # porque Robin entra diretamente no residual variacional.
-    if mode == "injection":
-        return []
-
-    elif mode == "stop":
-        return []
-
-    elif mode == "production":
-        return []
-
 # ----------------
 # Parâmetro adimensional da condição de Robin
-Gamma_open = Constant(100.0)
+Gamma_open = Constant(1000.0)
 
 Gamma_left = Constant(0.0)
 Gamma_right = Constant(0.0)
@@ -200,7 +168,7 @@ x_values = mesh.coordinates.dat.data_ro # Laira
 
 sol_values = []
 p_values_deg1 = []
-p_dimentional_values = []
+p_dimensional_values = []
 psol_deg1 = Function(Vref)
 
 # ===== Espaço para velocidade de Darcy =====
@@ -222,11 +190,9 @@ print("Characteristic velocity =", u_c, "m/s")
 
 while T <= T_total:
     step += 1
-    mode = operation_mode(T)
 
     update_well_pressures(T)
-    bcs = hydraulic_bcs(T)
-    solve(F == 0, p, bcs=bcs, solver_parameters=solver_parameters)
+    solve(F == 0, p, solver_parameters=solver_parameters)
     
 
     print(
@@ -268,6 +234,7 @@ while T <= T_total:
             f"erro={dPdx_left - robin_left:.2e}"
         )
     """
+    """
     if operation_mode(T) == "production":
         dPdx = Function(V_u)
         dPdx.project(p.dx(0))
@@ -284,7 +251,7 @@ while T <= T_total:
             f"Gamma(P-Pw)={robin_right:.6f}, "
             f"erro={-dPdx_right - robin_right:.2e}"
         )
-
+    """
 
     # -----
     u_vals = u.dat.data_ro.copy()  # representa U adimensional 
@@ -296,8 +263,8 @@ while T <= T_total:
     sol_vec = p.dat.data_ro.copy()   # adimensionalized pressure (P)
     sol_values.append(sol_vec)
 
-    p_dimentional_vec = sol_vec * p_c  # dimensionalized pressure   (p = P *pc)
-    p_dimentional_values.append(p_dimentional_vec)
+    p_dimensional_vec = sol_vec * p_c  # dimensionalized pressure   (p = P *pc)
+    p_dimensional_values.append(p_dimensional_vec)
 
     psol_deg1.project(p)
     p_vec_deg1 = psol_deg1.dat.data_ro.copy()
@@ -366,7 +333,7 @@ for i in steps_to_compare:
     # Pressão dimensional convertida novamente para adimensional
     ax.plot(
         x_values,
-        p_dimentional_values[i-1] / p_c,
+        p_dimensional_values[i-1] / p_c,
         linestyle="--",
         linewidth=2,
         label=f"Dimensional: t = {i} dias"
