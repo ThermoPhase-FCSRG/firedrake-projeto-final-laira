@@ -1,6 +1,6 @@
 """
 Trabalho Final — Disciplina: GA 033 - Elementos Finitos
-Tema: Escoamento monofásico compressível de gás ideal em meio poroso (1D)
+Tema: Escoamento monofásico compressível de gás ideal em meio poroso (2D)
 Formulação variacional com Firedrake
 
 Descrição do problema: (transiente)
@@ -41,13 +41,18 @@ from firedrake import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
+from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
 
 # Mesh definition
-numel = 100 # mudei de 200 para 100 (!!!)
-L = 200.0   # comprimento caracteristico 
+numel_x = 100 # mudei de 200 para 100 (!!!)
+L = 200.0   # comprimento físico do reservatório em metros (m) 
 X_left, X_right = 0.0, 1  # valor adimensionalizado
-mesh = IntervalMesh(numel, X_left, X_right)
+
+numel_y = 10 # rever depois (!!!)
+H = 5.0 # altura do reservatório em metros (m)
+Y_bottom, Y_top = 0.0, 1.0 # valor adimensionalizado
+
+mesh = RectangleMesh(numel_x, numel_y, X_left, X_right, Y_bottom, Y_top)
 
 # Function space declaration
 degree = 1  # Polynomial degree of approximation
@@ -308,7 +313,7 @@ plt.grid(False, linestyle='--', linewidth=0.1, which='minor')
 
 # Displaying the plot
 plt.tight_layout()
-plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_ROBIN / "cyclic-dimensionless-ideal-transient-robin-pressure.png")
+plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D / "cyclic-dimensionless-ideal-transient-robin-pressure.png")
     
 #plt.show()
 
@@ -349,7 +354,7 @@ ax.legend()
 fig.tight_layout()
 
 fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
+    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
     / "comparison-dimensionless-dimensional-pressure-cyclic-transient-robin.png"
 )
 # ----------------
@@ -386,7 +391,7 @@ ax.legend()
 fig.tight_layout()
 
 fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
+    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
     / "comparison-dimensionless-dimensional-velocity-cyclic-transient-robin.png"
 )
 
@@ -411,6 +416,6 @@ ax.legend()
 
 fig.tight_layout()
 fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
+    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
     / "cyclic-dimensionless-ideal-transient-robin-velocity.png"
 )
