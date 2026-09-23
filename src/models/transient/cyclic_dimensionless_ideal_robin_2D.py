@@ -45,24 +45,29 @@ from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
 
 # Mesh definition
 numel_x = 100 # mudei de 200 para 100 (!!!)
-L = 200.0   # comprimento físico do reservatório em metros (m) 
-X_left, X_right = 0.0, 1  # valor adimensionalizado
-
 numel_y = 10 # rever depois (!!!)
-H = 5.0 # altura do reservatório em metros (m)
-Y_bottom, Y_top = 0.0, 1.0 # valor adimensionalizado
+
+L = 500.0   # comprimento característico  
+
+# domínio adimensionalizado 
+X_left, X_right = 0.0, 1.0 
+Y_bottom, Y_top = 0.0, 0.2
 
 mesh = RectangleMesh(numel_x, numel_y, X_left, X_right, Y_bottom, Y_top)
 
+# ==========================================
 # Function space declaration
 degree = 1  # Polynomial degree of approximation
 V = FunctionSpace(mesh, "CG", degree)
 Vref = FunctionSpace(mesh, "CG", 1)
 
+# ==========================================
 # Initial condition
-# ic = Constant(1e7)
+""" isso significa P(X,Y,0) = 1.0, ou seja, 
+todo o reservatório começa com pressão adimensional igual a 1."""
 ic = Constant(1.0)  # valor adimensionalizado
 
+# ==========================================
 # Trial and Test functions
 p = Function(V)
 p_k = Function(V)
@@ -71,7 +76,7 @@ v = TestFunction(V)
 p_injection_left = Constant(2.0)
 p_production_right = Constant(1.0)
 
-
+# ==========================================
 # Physical parameters
 phi = Constant(0.15)        # porosity
 # kappa = Constant(2.6647e-13)     # permeability [m^2]
@@ -113,15 +118,14 @@ for day in [0, 10, 30, 40, 60, 70, 90, 100, 120, 130, 150, 160, 180, 200, 300, 3
     print(day, operation_mode(T_test))
 
 
-# ----------------
+# ==================================================
 # Parâmetro adimensional da condição de Robin
 Gamma_open = Constant(1000.0)
 
 Gamma_left = Constant(0.0)
 Gamma_right = Constant(0.0)
 
-
-# -----------------
+# ==================================================
 def update_well_pressures(T):
     mode = operation_mode(T)
 
@@ -138,12 +142,12 @@ def update_well_pressures(T):
         Gamma_right.assign(Gamma_open)
 
 
-# ------------------
-
+# ==================================================
 # Assigning the IC
 p_k.assign(ic)
 p.assign(ic)
 
+# ==================================================
 """ não vai precisar para o caso admensionalizado
 # Compressibility factor fitted from PR-EoS in terms of pressure
 def Z(p):
@@ -153,12 +157,16 @@ def Z(p):
 def fp(p):
     return p / Z(p)
 """ 
+
+# ==================================================
 # Residual variational formulation
-F = inner((p - p_k) / dT, v) * dx + inner(p * grad(p), grad(v)) * dx
+F = (inner((p - p_k) / dT, v) * dx          
+     + inner(p * grad(p), grad(v)) * dx)
 F -= f * v * dx
 F += Gamma_left * p * (p - p_injection_left) * v * ds(1)   # Robin condition at x=0
 F += Gamma_right * p * (p - p_production_right) * v * ds(2)  # Robin condition at x=L
 
+# ==================================================
 # Solver parameters
 solver_parameters = {
     'mat_type': 'aij',
@@ -176,6 +184,7 @@ p_values_deg1 = []
 p_dimensional_values = []
 psol_deg1 = Function(Vref)
 
+# ==================================================
 # ===== Espaço para velocidade de Darcy =====
 V_u = FunctionSpace(mesh, "DG", 0)   # espaço descontínuo por elemento
 u = Function(V_u, name="Darcy velocity")
