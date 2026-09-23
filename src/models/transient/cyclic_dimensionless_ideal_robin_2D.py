@@ -53,7 +53,7 @@ L = 500.0   # comprimento característico
 X_left, X_right = 0.0, 1.0 
 Y_bottom, Y_top = 0.0, 0.2
 
-mesh = RectangleMesh(numel_x, numel_y, X_left, X_right, Y_bottom, Y_top)
+mesh = RectangleMesh(numel_x, numel_y, X_right - X_left, Y_top - Y_bottom)
 
 # ==========================================
 # Function space declaration
