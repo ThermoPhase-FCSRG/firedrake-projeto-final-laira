@@ -272,3 +272,108 @@ def plot_pressure_regime_2d(
 
     plt.close(figure)
 
+def plot_mid_height_transient_profiles(
+    pressure_functions,
+    time_days,
+    regime_names,
+    figures_directory,
+    y_mid=0.1,
+    nx=200,
+):
+    """
+    Plots mid-height pressure profiles in three separate subplots.
+
+    Parameters
+    ----------
+    pressure_functions : list
+        Stored Firedrake pressure functions.
+
+    time_days : list
+        Physical days associated with each pressure function.
+
+    regime_names : list
+        Operating regime associated with each profile.
+
+    figures_directory : Path
+        Directory where the figure will be saved.
+
+    y_mid : float
+        Fixed dimensionless height.
+
+    nx : int
+        Number of points along the X direction.
+    """
+
+    x_values = np.linspace(0.0, 1.0, nx)
+
+    pressure_profiles = []
+
+    for pressure_function in pressure_functions:
+
+        pressure_values = np.array([
+            point_value(
+                pressure_function,
+                x_value,
+                y_mid,
+            )
+            for x_value in x_values
+        ])
+
+        pressure_profiles.append(pressure_values)
+
+    regime_order = [
+        "Injection",
+        "Stop",
+        "Production",
+    ]
+
+    fig, axes = plt.subplots(
+        1,
+        3,
+        figsize=(18, 5),
+        sharey=True,
+    )
+
+    for ax, regime_name in zip(axes, regime_order):
+
+        for pressure_values, time_day, current_regime in zip(
+            pressure_profiles,
+            time_days,
+            regime_names,
+        ):
+
+            if current_regime != regime_name:
+                continue
+
+            ax.plot(
+                x_values,
+                pressure_values,
+                label=f"Day {time_day}",
+            )
+
+        ax.set_title(regime_name)
+        ax.set_xlabel("Dimensionless position, X")
+        ax.set_xlim(0.0, 1.0)
+        ax.grid(True)
+        ax.legend()
+
+    axes[0].set_ylabel("Dimensionless pressure, P")
+
+    fig.suptitle(
+        "Mid-height transient pressure profiles",
+    )
+
+    fig.tight_layout()
+
+    filename = (
+        figures_directory
+        / "mid_height_transient_profiles.png"
+    )
+
+    fig.savefig(
+        filename,
+        dpi=300,
+        bbox_inches="tight",
+    )
+
+    plt.close(fig)

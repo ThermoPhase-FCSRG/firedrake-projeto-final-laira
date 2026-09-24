@@ -34,6 +34,7 @@ from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
 from src.plotting.simulations.plot_2d import (
     plot_pressure_2d,
     plot_pressure_regime_2d,
+    plot_mid_height_transient_profiles,
 )
 
 # Mesh definition
@@ -422,7 +423,47 @@ plot_pressure_regime_2d(
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
 )
 
+# -------------------------------------------------------------------------
+# Mid-height transient profiles
+# ---------------------------------------------------------
 
+mid_height_functions = [
+    # Injection
+    p_snapshots[0],    # Day 1
+    p_snapshots[14],   # Day 15
+    p_snapshots[28],   # Day 29
+
+    # Stop
+    p_snapshots[29],   # Day 30
+    p_snapshots[44],   # Day 45
+    p_snapshots[58],   # Day 59
+
+    # Production
+    p_snapshots[59],   # Day 60
+    p_snapshots[74],   # Day 75
+    p_snapshots[88],   # Day 89
+]
+
+mid_height_days = [
+    1, 15, 29,
+    30, 45, 59,
+    60, 75, 89,
+]
+
+mid_height_regimes = [
+    "Injection", "Injection", "Injection",
+    "Stop", "Stop", "Stop",
+    "Production", "Production", "Production",
+]
+
+plot_mid_height_transient_profiles(
+    pressure_functions=mid_height_functions,
+    time_days=mid_height_days,
+    regime_names=mid_height_regimes,
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+# ---------------------------------------------------------
 
 
 
