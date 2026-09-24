@@ -295,7 +295,6 @@ injection_functions, injection_days = get_regime_snapshots(
     p_snapshots,
     days=[180, 190, 200, 209],
 )
-
 plot_pressure_regime_2d(
     pressure_functions=injection_functions,
     time_days=injection_days,
@@ -308,7 +307,6 @@ injection_functions, injection_days = get_regime_snapshots(
     p_snapshots,
     days=[270, 280, 290, 299],
 )
-
 plot_pressure_regime_2d(
     pressure_functions=injection_functions,
     time_days=injection_days,
@@ -316,22 +314,61 @@ plot_pressure_regime_2d(
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
 )
 
+# ----------------------------------------------------------------
 # Regime de poços fechados
-plot_pressure_regime_2d( 
-    # vai de 30 <= dias < 60
-    # vai de 29 <= snapshots < 59
-    pressure_functions=[
-        p_snapshots[29],
-        p_snapshots[39],
-        p_snapshots[49],
-        p_snapshots[58],
-    ],
-    time_days=[30, 40, 50, 59],
-    regime_name="stop",
+# Stop - ciclo 1
+stop_functions, stop_days = get_regime_snapshots(
+    p_snapshots,
+    days=[30, 40, 50, 59],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=stop_functions,
+    time_days=stop_days,
+    regime_name="stop_cycle_1",
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
 )
 
+# Stop - ciclo 2
+stop_functions, stop_days = get_regime_snapshots(
+    p_snapshots,
+    days=[120, 130, 140, 149],
+)
 
+plot_pressure_regime_2d(
+    pressure_functions=stop_functions,
+    time_days=stop_days,
+    regime_name="stop_cycle_2",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+# Stop - ciclo 3
+stop_functions, stop_days = get_regime_snapshots(
+    p_snapshots,
+    days=[210, 220, 230, 239],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=stop_functions,
+    time_days=stop_days,
+    regime_name="stop_cycle_3",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+# Stop - ciclo 4
+stop_functions, stop_days = get_regime_snapshots(
+    p_snapshots,
+    days=[300, 310, 320, 329],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=stop_functions,
+    time_days=stop_days,
+    regime_name="stop_cycle_4",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+# ----------------------------------------------------------------
 # Regime de produção
 plot_pressure_regime_2d(  
     # vai de 60 <= dias < 90
