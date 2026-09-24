@@ -1,28 +1,17 @@
 """
-Trabalho Final — Disciplina: GA 033 - Elementos Finitos
 Tema: Escoamento monofásico compressível de gás ideal em meio poroso (2D)
 Formulação variacional com Firedrake
 
-Descrição do problema: (transiente)
-----------------------
-Resolve-se o problema transiente de escoamento monofásico de um gás ideal
-em um meio poroso unidimensional, representando um reservatório de comprimento L.
-
 Admite-se que:
+- problema transiente (dependente do tempo),
 - o meio é rígido (porosidade constante),
 - o gás é ideal (fator de compressibilidade Z = 1),
 - não há termo fonte,
 - efeitos gravitacionais são desprezados.
 
-A equação governante considerada é:
+A equação governante adimensionalizada considerada é:
 
-    φ ∂p/∂t = (k/μ) ∂/∂x ( p ∂p/∂x )
-
-onde:
-    p   = pressão
-    φ   = porosidade
-    k   = permeabilidade
-    μ   = viscosidade do fluido
+    ∂P/∂T = ∂/∂X ( p ∂p/∂X ) + ∂/∂Y ( p ∂p/∂Y )
 
 Condições de contorno:
     Condição de Robin na fronteira do poço injetor e produtor:
@@ -183,6 +172,7 @@ sol_values = []
 p_values_deg1 = []
 p_dimensional_values = []
 psol_deg1 = Function(Vref)
+p_snapshots = []
 
 # ==================================================
 # ===== Espaço para velocidade de Darcy =====
@@ -214,60 +204,12 @@ while T <= T_total:
     f"P_left={p.dat.data_ro[0]:.6f}, "
     f"P_right={p.dat.data_ro[-1]:.6f}"
 )
-
-
-
-
-
-
+    
     # ===== Pós-processamento da velocidade (TRANSIENTE) =====
     # u_expr = -(kappa / mu) * p.dx(0)    # OBSERVAÇÃO: NÃO ESTÁ ADMENSIONALIZADA AINDA
     u_expr =  -p.dx(0)  # adimensionalized Darcy velocity
     u.project(u_expr)
 
-
-    # -----
-    # teste
-    """
-    if operation_mode(T) == "injection":
-        dPdx = Function(V_u)
-        dPdx.project(p.dx(0))
-
-        dPdx_left = dPdx.dat.data_ro[0]
-
-        P_left = p.dat.data_ro[0]
-
-        robin_left = float(Gamma_left) * (
-            P_left - float(p_injection_left)
-        )
-
-        print(
-            f"Robin left: "
-            f"P_x={dPdx_left:.6f}, "
-            f"Gamma(P-Pw)={robin_left:.6f}, "
-            f"erro={dPdx_left - robin_left:.2e}"
-        )
-    """
-    """
-    if operation_mode(T) == "production":
-        dPdx = Function(V_u)
-        dPdx.project(p.dx(0))
-        dPdx_right = dPdx.dat.data_ro[-1]
-        P_right = p.dat.data_ro[-1]
-
-        robin_right = float(Gamma_right) * (
-            P_right - float(p_production_right)
-        )
-
-        print(
-            f"Robin right: "
-            f"-P_x={-dPdx_right:.6f}, "
-            f"Gamma(P-Pw)={robin_right:.6f}, "
-            f"erro={-dPdx_right - robin_right:.2e}"
-        )
-    """
-
-    # -----
     u_vals = u.dat.data_ro.copy()  # representa U adimensional 
     u_time_series.append(u_vals)
 
@@ -276,6 +218,11 @@ while T <= T_total:
 
     sol_vec = p.dat.data_ro.copy()   # adimensionalized pressure (P)
     sol_values.append(sol_vec)
+
+    p_snapshot = Function(V)
+    p_snapshot.assign(p)
+
+    p_snapshots.append(p_snapshot)
 
     p_dimensional_vec = sol_vec * p_c  # dimensionalized pressure   (p = P *pc)
     p_dimensional_values.append(p_dimensional_vec)
@@ -287,7 +234,8 @@ while T <= T_total:
 
     T += dT
 
-print("Number of stored solutions:", len(p_values_deg1))
+# print("Number of stored solutions:", len(p_values_deg1))
+# print("Número de snapshots:", len(p_snapshots))
 
 # *** Plotting ***
 
