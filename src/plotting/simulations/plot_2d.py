@@ -148,3 +148,135 @@ def plot_pressure_2d(
 
     figure.savefig(filename, dpi=300)
     plt.close(figure)
+
+def plot_pressure_regime_2d(
+    pressure_functions,
+    time_days,
+    regime_name,
+    figures_directory,
+    nx=100,
+    ny=50,
+):
+    """
+    Plots pressure fields from different times of the same regime.
+
+    Parameters
+    ----------
+    pressure_functions : list
+        List of Firedrake pressure functions.
+
+    time_days : list
+        Simulation times in days.
+
+    regime_name : str
+        Name of the operating regime.
+
+    figures_directory : Path
+        Directory where the figure will be saved.
+
+    nx : int
+        Number of points in the X direction.
+
+    ny : int
+        Number of points in the Y direction.
+    """
+
+    x_grid = np.linspace(0.0, 1.0, nx)
+    y_grid = np.linspace(0.0, 0.2, ny)
+
+    XX, YY = np.meshgrid(x_grid, y_grid)
+
+    pressure_grids = []
+
+    for pressure_function in pressure_functions:
+        pressure_grid = sample_field(
+            pressure_function,
+            XX,
+            YY,
+        )
+
+        pressure_grids.append(pressure_grid)
+
+    pressure_min = min(
+        pressure_grid.min()
+        for pressure_grid in pressure_grids
+    )
+
+    pressure_max = max(
+        pressure_grid.max()
+        for pressure_grid in pressure_grids
+    )
+
+    levels = np.linspace(
+        pressure_min - 1.0e-6,
+        pressure_max + 1.0e-6,
+        21,
+    )
+
+    figure, axes = plt.subplots(
+        2,
+        2,
+        figsize=(12, 6),
+        constrained_layout=True,
+    )
+
+    axes = axes.ravel()
+
+    contour = None
+
+    for axis, pressure_grid, day in zip(
+        axes,
+        pressure_grids,
+        time_days,
+    ):
+        contour = axis.contourf(
+            XX,
+            YY,
+            pressure_grid,
+            levels=levels,
+            extend="both",
+        )
+
+        axis.set_xlabel("X")
+        axis.set_ylabel("Y")
+
+        axis.set_title(
+            f"t = {day:.1f} dias"
+        )
+
+        axis.set_aspect("equal")
+
+    colorbar = figure.colorbar(
+        contour,
+        ax=axes,
+        location="right",
+        shrink=0.9,
+    )
+
+    colorbar.set_label(
+        "Pressão adimensional"
+    )
+
+    figure.suptitle(
+        f"Campo de pressão — {regime_name}",
+        fontsize=14,
+    )
+
+    figures_directory = Path(figures_directory)
+    figures_directory.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    filename = (
+        figures_directory
+        / f"pressure_2d_{regime_name}.png"
+    )
+
+    figure.savefig(
+        filename,
+        dpi=300,
+    )
+
+    plt.close(figure)
+
