@@ -370,22 +370,57 @@ plot_pressure_regime_2d(
 
 # ----------------------------------------------------------------
 # Regime de produção
-plot_pressure_regime_2d(  
-    # vai de 60 <= dias < 90
-    # vai de 59 <= snapshots < 89
-    pressure_functions=[
-        p_snapshots[59],
-        p_snapshots[69],
-        p_snapshots[79],
-        p_snapshots[88],
-    ],
-    time_days=[60, 70, 80, 89],
-    regime_name="production",
+# Production - ciclo 1
+production_functions, production_days = get_regime_snapshots(
+    p_snapshots,
+    days=[60, 70, 80, 89],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=production_functions,
+    time_days=production_days,
+    regime_name="production_cycle_1",
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
 )
 
+# Production - ciclo 2
+production_functions, production_days = get_regime_snapshots(
+    p_snapshots,
+    days=[150, 160, 170, 179],
+)
 
+plot_pressure_regime_2d(
+    pressure_functions=production_functions,
+    time_days=production_days,
+    regime_name="production_cycle_2",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
 
+# Production - ciclo 3
+production_functions, production_days = get_regime_snapshots(
+    p_snapshots,
+    days=[240, 250, 260, 269],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=production_functions,
+    time_days=production_days,
+    regime_name="production_cycle_3",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+# Production - ciclo 4
+production_functions, production_days = get_regime_snapshots(
+    p_snapshots,
+    days=[330, 340, 350, 359],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=production_functions,
+    time_days=production_days,
+    regime_name="production_cycle_4",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
 
 
 
