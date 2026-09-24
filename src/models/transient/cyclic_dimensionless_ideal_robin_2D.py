@@ -243,6 +243,18 @@ while T <= T_total:
 # print("Number of stored solutions:", len(p_values_deg1))
 # print("Número de snapshots:", len(p_snapshots))
 
+def get_regime_snapshots(p_snapshots, days):
+    """
+    Selects pressure snapshots for specified physical days.
+    """
+
+    pressure_functions = [
+        p_snapshots[day - 1]
+        for day in days
+    ]
+
+    return pressure_functions, days
+
 # =================================
 # Plotting
 # =================================
@@ -253,20 +265,56 @@ plot_pressure_2d(
 )
 
 # Regime de injeção
-plot_pressure_regime_2d(  
-    # vai de 1 <= dias < 30
-    # vai de 0 <= snapshots < 29
-    pressure_functions=[
-        p_snapshots[0],    # indice do snapshot = dia -1
-        p_snapshots[9],
-        p_snapshots[19],
-        p_snapshots[28],
-    ],
-    time_days=[1, 10, 20, 29],
-    regime_name="injection",
+injection_functions, injection_days = get_regime_snapshots(
+    p_snapshots,
+    days=[1, 10, 20, 29],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=injection_functions,
+    time_days=injection_days,
+    regime_name="injection_cycle_1",
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
 )
 
+# Segundo ciclo de injeção
+injection_functions, injection_days = get_regime_snapshots(
+    p_snapshots,
+    days=[90, 100, 110, 119],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=injection_functions,
+    time_days=injection_days,
+    regime_name="injection_cycle_2",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+# Terceiro ciclo de injeção
+injection_functions, injection_days = get_regime_snapshots(
+    p_snapshots,
+    days=[180, 190, 200, 209],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=injection_functions,
+    time_days=injection_days,
+    regime_name="injection_cycle_3",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+# Quarto ciclo de injeção
+injection_functions, injection_days = get_regime_snapshots(
+    p_snapshots,
+    days=[270, 280, 290, 299],
+)
+
+plot_pressure_regime_2d(
+    pressure_functions=injection_functions,
+    time_days=injection_days,
+    regime_name="injection_cycle_4",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
 
 # Regime de poços fechados
 plot_pressure_regime_2d( 
@@ -315,7 +363,7 @@ plot_pressure_regime_2d(
 
 
 
-
+"""
 # Setting up the figure object
 fig = plt.figure(dpi=300, figsize=(8, 6))
 ax = plt.subplot(111)
@@ -453,3 +501,4 @@ fig.savefig(
     FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
     / "cyclic-dimensionless-ideal-transient-robin-velocity.png"
 )
+"""
