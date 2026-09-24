@@ -31,7 +31,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
-from src.plotting.simulations.plot_2d import plot_pressure_2d
+from src.plotting.simulations.plot_2d import (
+    plot_pressure_2d,
+    plot_pressure_regime_2d,
+)
 
 # Mesh definition
 numel_x = 100 # mudei de 200 para 100 (!!!)
@@ -242,10 +245,57 @@ while T <= T_total:
 
 # =================================
 # Plotting
-
+# =================================
 plot_pressure_2d(
     pressure_function=p_snapshots[0],
     time_days=1.0,
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+# Regime de injeção
+plot_pressure_regime_2d(  
+    # vai de 1 <= dias < 30
+    # vai de 0 <= snapshots < 29
+    pressure_functions=[
+        p_snapshots[0],    # indice do snapshot = dia -1
+        p_snapshots[9],
+        p_snapshots[19],
+        p_snapshots[28],
+    ],
+    time_days=[1, 10, 20, 29],
+    regime_name="injection",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+
+# Regime de poços fechados
+plot_pressure_regime_2d( 
+    # vai de 30 <= dias < 60
+    # vai de 29 <= snapshots < 59
+    pressure_functions=[
+        p_snapshots[29],
+        p_snapshots[39],
+        p_snapshots[49],
+        p_snapshots[58],
+    ],
+    time_days=[30, 40, 50, 59],
+    regime_name="stop",
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+
+# Regime de produção
+plot_pressure_regime_2d(  
+    # vai de 60 <= dias < 90
+    # vai de 59 <= snapshots < 89
+    pressure_functions=[
+        p_snapshots[59],
+        p_snapshots[69],
+        p_snapshots[79],
+        p_snapshots[88],
+    ],
+    time_days=[60, 70, 80, 89],
+    regime_name="production",
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
 )
 

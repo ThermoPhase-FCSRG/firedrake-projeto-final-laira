@@ -156,6 +156,8 @@ def plot_pressure_regime_2d(
     figures_directory,
     nx=100,
     ny=50,
+    pressure_min=1.0,
+    pressure_max=2.0,
 ):
     """
     Plots pressure fields from different times of the same regime.
@@ -197,19 +199,9 @@ def plot_pressure_regime_2d(
 
         pressure_grids.append(pressure_grid)
 
-    pressure_min = min(
-        pressure_grid.min()
-        for pressure_grid in pressure_grids
-    )
-
-    pressure_max = max(
-        pressure_grid.max()
-        for pressure_grid in pressure_grids
-    )
-
     levels = np.linspace(
-        pressure_min - 1.0e-6,
-        pressure_max + 1.0e-6,
+        pressure_min - 1.0e-3,
+        pressure_max + 1.0e-3,
         21,
     )
 
