@@ -99,13 +99,29 @@ def plot_pressure_2d(
         YY,
     )
 
+    print("Shape da pressão:", pressure_grid.shape)
+    print("Menor valor:", np.nanmin(pressure_grid))
+    print("Maior valor:", np.nanmax(pressure_grid))
+    print("Quantidade de NaN:", np.isnan(pressure_grid).sum())
+    print("Quantidade de valores finitos:", np.isfinite(pressure_grid).sum())
+
     figure, axis = plt.subplots(figsize=(10, 4))
+
+    pressure_min = pressure_grid.min()
+    pressure_max = pressure_grid.max()
+
+    levels = np.linspace(
+        pressure_min - 1.0e-6,
+        pressure_max + 1.0e-6,
+        21,
+    )
 
     contour = axis.contourf(
         XX,
         YY,
         pressure_grid,
-        levels=20,
+        levels=levels,
+        extend="both",
     )
 
     colorbar = figure.colorbar(contour, ax=axis)

@@ -31,6 +31,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
+from src.plotting.simulations.plot_2d import plot_pressure_2d
 
 # Mesh definition
 numel_x = 100 # mudei de 200 para 100 (!!!)
@@ -198,12 +199,14 @@ while T <= T_total:
     update_well_pressures(T)
     solve(F == 0, p, solver_parameters=solver_parameters)
     
-
+    """
     print(
     f"day={step:3d}, mode={operation_mode(T)}, "
     f"P_left={p.dat.data_ro[0]:.6f}, "
-    f"P_right={p.dat.data_ro[-1]:.6f}"
-)
+    f"P_right={p.dat.data_ro[-1]:.6f}" 
+    )
+    """
+
     
     # ===== Pós-processamento da velocidade (TRANSIENTE) =====
     # u_expr = -(kappa / mu) * p.dx(0)    # OBSERVAÇÃO: NÃO ESTÁ ADMENSIONALIZADA AINDA
@@ -237,7 +240,31 @@ while T <= T_total:
 # print("Number of stored solutions:", len(p_values_deg1))
 # print("Número de snapshots:", len(p_snapshots))
 
-# *** Plotting ***
+# =================================
+# Plotting
+
+plot_pressure_2d(
+    pressure_function=p_snapshots[0],
+    time_days=1.0,
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Setting up the figure object
 fig = plt.figure(dpi=300, figsize=(8, 6))
