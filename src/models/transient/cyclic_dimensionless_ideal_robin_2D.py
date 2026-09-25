@@ -181,13 +181,15 @@ p_snapshots = []
 
 # ==================================================
 # ===== Espaço para velocidade de Darcy =====
-V_u = FunctionSpace(mesh, "DG", 0)   # espaço descontínuo por elemento
+V_u = VectorFunctionSpace(mesh, "DG", 0)   # vetorial 
 u = Function(V_u, name="Darcy velocity")
+
+V_scalar = FunctionSpace(mesh, "DG", 0)  
 
 # Coordenada do centro de cada elemento (para plot step)
 x = SpatialCoordinate(mesh)
-x_cell = Function(V_u)
-x_cell.project(x[0])
+x_cell = Function(V_scalar)
+x_cell.project(x[0])    # verificar se ainda é necessário (!!!)
 x_cells = x_cell.dat.data_ro.copy()
 
 u_time_series = [] # Lista para guardar velocidade ao longo do tempo
@@ -214,7 +216,7 @@ while T <= T_total:
     
     # ===== Pós-processamento da velocidade (TRANSIENTE) =====
     # u_expr = -(kappa / mu) * p.dx(0)    # OBSERVAÇÃO: NÃO ESTÁ ADMENSIONALIZADA AINDA
-    u_expr =  -p.dx(0)  # adimensionalized Darcy velocity
+    u_expr =  -grad(p)  # adimensionalized Darcy velocity
     u.project(u_expr)
 
     u_vals = u.dat.data_ro.copy()  # representa U adimensional 
