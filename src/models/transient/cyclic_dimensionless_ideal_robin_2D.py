@@ -57,6 +57,11 @@ Y_bottom, Y_top = 0.0, 0.2
 
 mesh = RectangleMesh(numel_x, numel_y, X_right - X_left, Y_top - Y_bottom)
 
+# limites verticais do poço
+# defini o poço como sendo 20% da altura do reservatório 
+well_y_bottom = 0.08
+well_y_top = 0.12
+
 # ==========================================
 # Function space declaration
 degree = 1  # Polynomial degree of approximation
