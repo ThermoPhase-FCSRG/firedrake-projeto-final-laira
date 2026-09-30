@@ -272,7 +272,7 @@ def plot_pressure_regime_2d(
 
     plt.close(figure)
 
-def plot_mid_height_transient_profiles(
+def plot_mid_height_transient_pressure_profiles(
     pressure_functions,
     time_days,
     regime_names,
@@ -568,6 +568,96 @@ def plot_velocity_regime_2d(
     fig.savefig(
         filename,
         dpi=300,
+    )
+
+    plt.close(fig)
+
+def plot_mid_height_transient_velocity_profiles(
+    velocity_functions,
+    time_days,
+    regime_names,
+    figures_directory,
+    y_mid=0.1,
+    nx=200,
+):
+    """
+    Plots mid-height Darcy velocity magnitude profiles
+    in three separate subplots.
+    """
+
+    x_values = np.linspace(0.0, 1.0, nx)
+
+    velocity_profiles = []
+
+    for velocity_function in velocity_functions:
+
+        velocity_values = np.array([
+            velocity_function.at((x_value, y_mid))
+            for x_value in x_values
+        ])
+
+        velocity_magnitudes = np.linalg.norm(
+            velocity_values,
+            axis=1,
+        )
+
+        velocity_profiles.append(velocity_magnitudes)
+
+    regime_order = [
+        "Injection",
+        "Stop",
+        "Production",
+    ]
+
+    fig, axes = plt.subplots(
+        1,
+        3,
+        figsize=(18, 5),
+        sharey=True,
+    )
+
+    for ax, regime_name in zip(axes, regime_order):
+
+        for velocity_values, time_day, current_regime in zip(
+            velocity_profiles,
+            time_days,
+            regime_names,
+        ):
+
+            if current_regime != regime_name:
+                continue
+
+            ax.plot(
+                x_values,
+                velocity_values,
+                label=f"Day {time_day}",
+            )
+
+        ax.set_title(regime_name)
+        ax.set_xlabel("Dimensionless position, X")
+        ax.set_xlim(0.0, 1.0)
+        ax.grid(True)
+        ax.legend()
+
+    axes[0].set_ylabel(
+        r"Dimensionless Darcy velocity magnitude, $|\mathbf{U}|$"
+    )
+
+    fig.suptitle(
+        "Mid-height transient Darcy velocity profiles",
+    )
+
+    fig.tight_layout()
+
+    filename = (
+        figures_directory
+        / "mid_height_transient_velocity_profiles.png"
+    )
+
+    fig.savefig(
+        filename,
+        dpi=300,
+        bbox_inches="tight",
     )
 
     plt.close(fig)

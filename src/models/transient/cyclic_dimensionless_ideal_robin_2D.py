@@ -34,9 +34,10 @@ from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D
 from src.plotting.simulations.plot_2d import (
     plot_pressure_2d,
     plot_pressure_regime_2d,
-    plot_mid_height_transient_profiles,
+    plot_mid_height_transient_pressure_profiles,
     plot_velocity_2d,
-    plot_velocity_regime_2d
+    plot_velocity_regime_2d,
+    plot_mid_height_transient_velocity_profiles,
 )
 
 # ==================================================
@@ -482,7 +483,7 @@ if ENABLE_PLOTS_PRESSURE:
         "Production", "Production", "Production",
     ]
 
-    plot_mid_height_transient_profiles(
+    plot_mid_height_transient_pressure_profiles(
         pressure_functions=mid_height_functions,
         time_days=mid_height_days,
         regime_names=mid_height_regimes,
@@ -701,8 +702,44 @@ if ENABLE_PLOTS_VELOCITY:
         figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
     )
 
+    # -------------------------------------------------------------------------
+    # Mid-height transient profiles
+    # -------------------------------------------------------------------------
+    mid_height_velocity_functions = [
+        # Injection
+        u_snapshots[0],    # Day 1
+        u_snapshots[14],   # Day 15
+        u_snapshots[28],   # Day 29
 
+        # Stop
+        u_snapshots[29],   # Day 30
+        u_snapshots[44],   # Day 45
+        u_snapshots[58],   # Day 59
 
+        # Production
+        u_snapshots[59],   # Day 60
+        u_snapshots[74],   # Day 75
+        u_snapshots[88],   # Day 89
+    ]
+
+    mid_height_velocity_days = [
+        1, 15, 29,
+        30, 45, 59,
+        60, 75, 89,
+    ]
+
+    mid_height_velocity_regimes = [
+        "Injection", "Injection", "Injection",
+        "Stop", "Stop", "Stop",
+        "Production", "Production", "Production",
+    ]
+
+    plot_mid_height_transient_velocity_profiles(
+        velocity_functions=mid_height_velocity_functions,
+        time_days=mid_height_velocity_days,
+        regime_names=mid_height_velocity_regimes,
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )        
 
 global_velocity_max = max(
     np.max(np.sqrt(
