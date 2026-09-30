@@ -1,5 +1,5 @@
 """
-Tema: Escoamento monofásico compressível de gás ideal em meio poroso (2D)
+Escoamento monofásico compressível de gás ideal em meio poroso (2D)
 Formulação variacional com Firedrake
 
 Admite-se que:
@@ -122,7 +122,7 @@ for day in [0, 10, 30, 40, 60, 70, 90, 100, 120, 130, 150, 160, 180, 200, 300, 3
 
 # ==================================================
 # Parâmetro adimensional da condição de Robin
-Gamma_open = Constant(1000.0)
+Gamma_open = Constant(2999.0)
 
 Gamma_left = Constant(0.0)
 Gamma_right = Constant(0.0)
@@ -256,6 +256,10 @@ while T <= T_total:
 
     T += dT
 
+np.save(
+    "pressure_gamma_2999.npy",
+    np.array(sol_values),
+)
 # print("Number of stored solutions:", len(p_values_deg1))
 # print("Número de snapshots:", len(p_snapshots))
 
@@ -530,14 +534,14 @@ if ENABLE_PLOTS_VELOCITY:
         Uy = velocity_values[:, 1]
 
         velocity_magnitude = np.sqrt(Ux**2 + Uy**2)
-
+        """
         print(
             f"\nDay {day}:"
             f"\n  Ux: min = {Ux.min():.6f}, max = {Ux.max():.6f}"
             f"\n  Uy: min = {Uy.min():.6f}, max = {Uy.max():.6f}"
             f"\n  |U|: min = {velocity_magnitude.min():.6f}, "
             f"max = {velocity_magnitude.max():.6f}"
-        )
+        )"""
 
     
     plot_velocity_regime_2d(
