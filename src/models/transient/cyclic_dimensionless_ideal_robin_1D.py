@@ -38,9 +38,10 @@ from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
 from src.plotting.simulations.plot_1d import (
     plot_pressure_1d,
     plot_pressure_regime_1d,
-    # plot_mid_height_transient_profiles,
-    # plot_velocity_1d,
-    # plot_velocity_regime_1d
+    plot_velocity_1d,
+    plot_velocity_regime_1d,
+    plot_pressure_comparison_1d,
+    plot_velocity_comparison_1d,
 )
 
 # Mesh definition
@@ -268,105 +269,42 @@ plot_pressure_regime_1d(
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN,
 )
 # ============================================================
-# Comparação: 
-"""
+# Velocidade separada por regime
+
+plot_velocity_regime_1d(
+    x_values=x_cells,
+    velocity_values=u_time_series,
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN,
+)
+
+# =======================================================
+# velocidade 
+plot_velocity_1d(
+    x_values=x_cells,
+    velocity_values=u_time_series,
+    time_steps=[1, 5, 10, 20, 50, 100, 200, 300, 350],
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN,
+)
+
+# ============================================
+# Comparação adimensional x dimensional
+
 steps_to_compare = [1, 50, 100]
 
-
-# pressão adimensional x pressão dimensional 
-fig, ax = plt.subplots(dpi=300, figsize=(8, 6))
-
-for i in steps_to_compare:
-
-    # Pressão adimensional
-    ax.plot(
-        x_values,
-        sol_values[i-1],
-        linewidth=2,
-        label=f"Adimensional: t = {i} dias"
-    )
-
-    # Pressão dimensional convertida novamente para adimensional
-    ax.plot(
-        x_values,
-        p_dimensional_values[i-1] / p_c,
-        linestyle="--",
-        linewidth=2,
-        label=f"Dimensional: t = {i} dias"
-    )
-
-ax.set_xlabel(r"$X$")
-ax.set_ylabel(r"Pressure / $p_c$")
-ax.set_xlim(0, 1)
-
-ax.grid(True)
-ax.legend()
-
-fig.tight_layout()
-
-fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
-    / "comparison-dimensionless-dimensional-pressure-cyclic-transient-robin.png"
-)
-# ----------------
-# velocidade adimensional x velocidade dimensional
-
-fig, ax = plt.subplots(dpi=300, figsize=(8, 6))
-
-for i in steps_to_compare:
-
-    # Velocidade adimensional
-    ax.plot(
-        x_cells,
-        u_time_series[i-1],
-        linewidth=2,
-        label=f"Adimensional: t = {i} dias"
-    )
-
-    # Velocidade dimensional convertida novamente para adimensional
-    ax.plot(
-        x_cells,
-        u_dimensional_time_series[i-1] / u_c,
-        linestyle="--",
-        linewidth=2,
-        label=f"Dimensional: t = {i} dias"
-    )
-
-ax.set_xlabel(r"$X$")
-ax.set_ylabel(r"$U = u/u_c$")
-ax.set_xlim(0, 1)
-
-ax.grid(True)
-ax.legend()
-
-fig.tight_layout()
-
-fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
-    / "comparison-dimensionless-dimensional-velocity-cyclic-transient-robin.png"
+plot_pressure_comparison_1d(
+    x_values=x_values,
+    pressure_values=sol_values,
+    pressure_dimensional_values=p_dimensional_values,
+    p_c=p_c,
+    time_steps=steps_to_compare,
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN,
 )
 
-# =====================================================
-# plotting velocity profiles over time
-fig, ax = plt.subplots(dpi=300, figsize=(8, 6))
-
-for i in steps_to_plot:
-    ax.step(
-        x_cells,
-        u_time_series[i-1],
-        where="mid",
-        linewidth=2,
-        label=f"t = {i} days"
-    )
-
-ax.set_xlabel(r"$X$")
-ax.set_ylabel(r"Dimensionless Darcy velocity, $U$")
-ax.set_xlim(0, 1)
-ax.grid(True)
-ax.legend()
-
-fig.tight_layout()
-fig.savefig(
-    FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
-    / "cyclic-dimensionless-ideal-transient-robin-velocity.png"
-) """
+plot_velocity_comparison_1d(
+    x_values=x_cells,
+    velocity_values=u_time_series,
+    velocity_dimensional_values=u_dimensional_time_series,
+    u_c=u_c,
+    time_steps=steps_to_compare,
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN,
+)
