@@ -377,3 +377,197 @@ def plot_mid_height_transient_profiles(
     )
 
     plt.close(fig)
+
+def get_velocity_magnitude(velocity_function):
+    """
+    Calcula a magnitude da velocidade de Darcy adimensional.
+
+    Parameters
+    ----------
+    velocity_function : Firedrake Function
+        Campo vetorial de velocidade em DG0.
+
+    Returns
+    -------
+    numpy.ndarray
+        Magnitude da velocidade em cada elemento.
+    """
+
+    velocity_values = velocity_function.dat.data_ro
+
+    velocity_magnitude = np.sqrt(
+        velocity_values[:, 0]**2
+        + velocity_values[:, 1]**2
+    )
+
+    return velocity_magnitude
+
+def plot_velocity_2d(
+    velocity_function,
+    time_days,
+    figures_directory,
+):
+    """
+    Plota a magnitude da velocidade de Darcy adimensional em 2D.
+    """
+
+    # Magnitude da velocidade em cada elemento
+    velocity_magnitude = get_velocity_magnitude(velocity_function)
+
+    # Coordenadas dos vértices da malha
+    mesh = velocity_function.function_space().mesh()
+    coordinates = mesh.coordinates.dat.data_ro
+
+    x = coordinates[:, 0]
+    y = coordinates[:, 1]
+
+    cell_node_map = mesh.coordinates.cell_node_map()
+    cells = cell_node_map.values
+
+    fig, ax = plt.subplots(
+        figsize=(8, 4),
+        dpi=300,
+    )
+
+    # Plotagem dos valores por elemento
+    collection = ax.tripcolor(
+        x,
+        y,
+        cells,
+        velocity_magnitude,
+        shading="flat",
+    )
+
+    fig.colorbar(
+        collection,
+        ax=ax,
+        label=r"$|\mathbf{U}|$",
+    )
+
+    ax.set_xlabel(r"$X$")
+    ax.set_ylabel(r"$Y$")
+    ax.set_title(
+        f"Dimensionless Darcy velocity — t = {time_days} days"
+    )
+
+    ax.set_aspect("equal")
+
+    fig.tight_layout()
+
+    fig.savefig(
+        figures_directory
+        / f"velocity-2d-t{time_days}.png"
+    )
+
+    plt.close(fig)
+
+def plot_velocity_regime_2d(
+    velocity_functions,
+    time_days,
+    regime_name,
+    figures_directory,
+):
+    """
+    Plota a magnitude da velocidade de Darcy em diferentes
+    tempos de um mesmo regime.
+    """
+
+    velocity_magnitudes = [
+        get_velocity_magnitude(velocity_function)
+        for velocity_function in velocity_functions
+    ]
+
+    velocity_min = min(
+        np.min(values)
+        for values in velocity_magnitudes
+    )
+
+    velocity_max = max(
+        np.max(values)
+        for values in velocity_magnitudes
+    )
+
+    mesh = velocity_functions[0].function_space().mesh()
+
+    coordinates = mesh.coordinates.dat.data_ro
+
+    x = coordinates[:, 0]
+    y = coordinates[:, 1]
+
+    cells = mesh.coordinates.cell_node_map().values
+
+    fig, axes = plt.subplots(
+        2,
+        2,
+        figsize=(12, 6),
+        constrained_layout=True,
+    )
+
+    axes = axes.ravel()
+
+    levels = np.linspace(
+        velocity_min,
+        velocity_max,
+        21,
+    )
+
+    contour = None
+
+    for ax, velocity_magnitude, day in zip(
+        axes,
+        velocity_magnitudes,
+        time_days,
+    ):
+
+        contour = ax.tripcolor(
+            x,
+            y,
+            cells,
+            velocity_magnitude,
+            shading="flat",
+            vmin=velocity_min,
+            vmax=velocity_max,
+        )
+
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+
+        ax.set_title(
+            f"t = {day} dias"
+        )
+
+        ax.set_aspect("equal")
+
+    colorbar = fig.colorbar(
+        contour,
+        ax=axes,
+        location="right",
+        shrink=0.9,
+    )
+
+    colorbar.set_label(
+        r"$|\mathbf{U}|$"
+    )
+
+    fig.suptitle(
+        f"Campo de velocidade de Darcy — {regime_name}",
+        fontsize=14,
+    )
+
+    figures_directory = Path(figures_directory)
+    figures_directory.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    filename = (
+        figures_directory
+        / f"velocity_2d_{regime_name}.png"
+    )
+
+    fig.savefig(
+        filename,
+        dpi=300,
+    )
+
+    plt.close(fig)

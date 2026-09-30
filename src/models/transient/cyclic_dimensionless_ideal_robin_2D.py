@@ -35,7 +35,14 @@ from src.plotting.simulations.plot_2d import (
     plot_pressure_2d,
     plot_pressure_regime_2d,
     plot_mid_height_transient_profiles,
+    plot_velocity_2d,
+    plot_velocity_regime_2d
 )
+
+# ==================================================
+# Plot control
+ENABLE_PLOTS_PRESSURE = False
+ENABLE_PLOTS_VELOCITY = True
 
 # Mesh definition
 numel_x = 100 # mudei de 200 para 100 (!!!)
@@ -194,6 +201,7 @@ x_cells = x_cell.dat.data_ro.copy()
 
 u_time_series = [] # Lista para guardar velocidade ao longo do tempo
 u_dimensional_time_series = [] # Lista para guardar velocidade dimensional ao longo do tempo
+u_snapshots = [] # Lista para guardar snapshots de velocidade ao longo do tempo
 
 u_c = float(kappa) * p_c / (float(mu) * L)
 print("Characteristic velocity =", u_c, "m/s")
@@ -224,6 +232,10 @@ while T <= T_total:
 
     u_dimensional_vals = u_vals * u_c      # u = U * u_c
     u_dimensional_time_series.append(u_dimensional_vals)
+
+    u_snapshot = Function(V_u)
+    u_snapshot.assign(u)
+    u_snapshots.append(u_snapshot)
 
     sol_vec = p.dat.data_ro.copy()   # adimensionalized pressure (P)
     sol_values.append(sol_vec)
@@ -258,225 +270,449 @@ def get_regime_snapshots(p_snapshots, days):
 
     return pressure_functions, days
 
+def get_velocity_regime_snapshots(u_snapshots, days):
+    """
+    Selects velocity snapshots for specified physical days.
+    """
+
+    velocity_functions = [
+        u_snapshots[day - 1]
+        for day in days
+    ]
+
+    return velocity_functions, days
 # =================================
-# Plotting
+# Plotting pressure 
 # =================================
-plot_pressure_2d(
-    pressure_function=p_snapshots[0],
-    time_days=1.0,
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+if ENABLE_PLOTS_PRESSURE:
+    plot_pressure_2d(
+        pressure_function=p_snapshots[0],
+        time_days=1.0,
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Regime de injeção
+    injection_functions, injection_days = get_regime_snapshots(
+        p_snapshots,
+        days=[1, 10, 20, 29],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=injection_functions,
+        time_days=injection_days,
+        regime_name="injection_cycle_1",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Segundo ciclo de injeção
+    injection_functions, injection_days = get_regime_snapshots(
+        p_snapshots,
+        days=[90, 100, 110, 119],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=injection_functions,
+        time_days=injection_days,
+        regime_name="injection_cycle_2",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Terceiro ciclo de injeção
+    injection_functions, injection_days = get_regime_snapshots(
+        p_snapshots,
+        days=[180, 190, 200, 209],
+    )
+    plot_pressure_regime_2d(
+        pressure_functions=injection_functions,
+        time_days=injection_days,
+        regime_name="injection_cycle_3",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Quarto ciclo de injeção
+    injection_functions, injection_days = get_regime_snapshots(
+        p_snapshots,
+        days=[270, 280, 290, 299],
+    )
+    plot_pressure_regime_2d(
+        pressure_functions=injection_functions,
+        time_days=injection_days,
+        regime_name="injection_cycle_4",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # ----------------------------------------------------------------
+    # Regime de poços fechados
+    # Stop - ciclo 1
+    stop_functions, stop_days = get_regime_snapshots(
+        p_snapshots,
+        days=[30, 40, 50, 59],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=stop_functions,
+        time_days=stop_days,
+        regime_name="stop_cycle_1",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Stop - ciclo 2
+    stop_functions, stop_days = get_regime_snapshots(
+        p_snapshots,
+        days=[120, 130, 140, 149],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=stop_functions,
+        time_days=stop_days,
+        regime_name="stop_cycle_2",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Stop - ciclo 3
+    stop_functions, stop_days = get_regime_snapshots(
+        p_snapshots,
+        days=[210, 220, 230, 239],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=stop_functions,
+        time_days=stop_days,
+        regime_name="stop_cycle_3",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Stop - ciclo 4
+    stop_functions, stop_days = get_regime_snapshots(
+        p_snapshots,
+        days=[300, 310, 320, 329],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=stop_functions,
+        time_days=stop_days,
+        regime_name="stop_cycle_4",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # ----------------------------------------------------------------
+    # Regime de produção
+    # Production - ciclo 1
+    production_functions, production_days = get_regime_snapshots(
+        p_snapshots,
+        days=[60, 70, 80, 89],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=production_functions,
+        time_days=production_days,
+        regime_name="production_cycle_1",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Production - ciclo 2
+    production_functions, production_days = get_regime_snapshots(
+        p_snapshots,
+        days=[150, 160, 170, 179],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=production_functions,
+        time_days=production_days,
+        regime_name="production_cycle_2",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Production - ciclo 3
+    production_functions, production_days = get_regime_snapshots(
+        p_snapshots,
+        days=[240, 250, 260, 269],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=production_functions,
+        time_days=production_days,
+        regime_name="production_cycle_3",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Production - ciclo 4
+    production_functions, production_days = get_regime_snapshots(
+        p_snapshots,
+        days=[330, 340, 350, 359],
+    )
+
+    plot_pressure_regime_2d(
+        pressure_functions=production_functions,
+        time_days=production_days,
+        regime_name="production_cycle_4",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # -------------------------------------------------------------------------
+    # Mid-height transient profiles
+    # ---------------------------------------------------------
+
+    mid_height_functions = [
+        # Injection
+        p_snapshots[0],    # Day 1
+        p_snapshots[14],   # Day 15
+        p_snapshots[28],   # Day 29
+
+        # Stop
+        p_snapshots[29],   # Day 30
+        p_snapshots[44],   # Day 45
+        p_snapshots[58],   # Day 59
+
+        # Production
+        p_snapshots[59],   # Day 60
+        p_snapshots[74],   # Day 75
+        p_snapshots[88],   # Day 89
+    ]
+
+    mid_height_days = [
+        1, 15, 29,
+        30, 45, 59,
+        60, 75, 89,
+    ]
+
+    mid_height_regimes = [
+        "Injection", "Injection", "Injection",
+        "Stop", "Stop", "Stop",
+        "Production", "Production", "Production",
+    ]
+
+    plot_mid_height_transient_profiles(
+        pressure_functions=mid_height_functions,
+        time_days=mid_height_days,
+        regime_names=mid_height_regimes,
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+
+# =================================
+# velocidade
+# =================================
+if ENABLE_PLOTS_VELOCITY:
+
+    plot_velocity_2d(
+        velocity_function=u_snapshots[0],
+        time_days=1,
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    plot_velocity_2d(
+        velocity_function=u_snapshots[84],
+        time_days=85,
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    plot_velocity_2d(
+        velocity_function=u_snapshots[359],
+        time_days=360,
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Regime de injeção - ciclo 1
+    injection_velocity, injection_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[1, 10, 20, 29],
+    )    
+    # TESTE DE VELOCIDADE
+    for velocity_function, day in zip(
+        injection_velocity,
+        injection_days,
+    ):
+        velocity_values = velocity_function.dat.data_ro
+
+        Ux = velocity_values[:, 0]
+        Uy = velocity_values[:, 1]
+
+        velocity_magnitude = np.sqrt(Ux**2 + Uy**2)
+
+        print(
+            f"\nDay {day}:"
+            f"\n  Ux: min = {Ux.min():.6f}, max = {Ux.max():.6f}"
+            f"\n  Uy: min = {Uy.min():.6f}, max = {Uy.max():.6f}"
+            f"\n  |U|: min = {velocity_magnitude.min():.6f}, "
+            f"max = {velocity_magnitude.max():.6f}"
+        )
+
+    
+    plot_velocity_regime_2d(
+        velocity_functions=injection_velocity,
+        time_days=injection_days,
+        regime_name="injection_cycle_1",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )   
+        # Regime de injeção - ciclo 2
+    injection_velocity, injection_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[90, 100, 110, 119],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=injection_velocity,
+        time_days=injection_days,
+        regime_name="injection_cycle_2",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+
+    # Regime de injeção - ciclo 3
+    injection_velocity, injection_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[180, 190, 200, 209],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=injection_velocity,
+        time_days=injection_days,
+        regime_name="injection_cycle_3",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+
+    # Regime de injeção - ciclo 4
+    injection_velocity, injection_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[270, 280, 290, 299],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=injection_velocity,
+        time_days=injection_days,
+        regime_name="injection_cycle_4",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # ==================================================
+    # Regime de poços fechados — STOP
+    # ==================================================
+
+    # Stop - ciclo 1
+    stop_velocity, stop_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[30, 40, 50, 59],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=stop_velocity,
+        time_days=stop_days,
+        regime_name="stop_cycle_1",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+
+    # Stop - ciclo 2
+    stop_velocity, stop_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[120, 130, 140, 149],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=stop_velocity,
+        time_days=stop_days,
+        regime_name="stop_cycle_2",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+
+    # Stop - ciclo 3
+    stop_velocity, stop_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[210, 220, 230, 239],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=stop_velocity,
+        time_days=stop_days,
+        regime_name="stop_cycle_3",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+
+    # Stop - ciclo 4
+    stop_velocity, stop_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[300, 310, 320, 329],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=stop_velocity,
+        time_days=stop_days,
+        regime_name="stop_cycle_4",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+        # ---------------------------------------------------------
+    # Regime de produção
+    # ---------------------------------------------------------
+
+    # Production - ciclo 1
+    production_velocity, production_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[60, 70, 80, 89],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=production_velocity,
+        time_days=production_days,
+        regime_name="production_cycle_1",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Production - ciclo 2
+    production_velocity, production_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[150, 160, 170, 179],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=production_velocity,
+        time_days=production_days,
+        regime_name="production_cycle_2",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Production - ciclo 3
+    production_velocity, production_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[240, 250, 260, 269],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=production_velocity,
+        time_days=production_days,
+        regime_name="production_cycle_3",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+    # Production - ciclo 4
+    production_velocity, production_days = get_velocity_regime_snapshots(
+        u_snapshots,
+        days=[330, 340, 350, 359],
+    )
+
+    plot_velocity_regime_2d(
+        velocity_functions=production_velocity,
+        time_days=production_days,
+        regime_name="production_cycle_4",
+        figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
+    )
+
+
+
+
+global_velocity_max = max(
+    np.max(np.sqrt(
+        u_values[:, 0]**2 +
+        u_values[:, 1]**2
+    ))
+    for u_values in u_time_series
 )
 
-# Regime de injeção
-injection_functions, injection_days = get_regime_snapshots(
-    p_snapshots,
-    days=[1, 10, 20, 29],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=injection_functions,
-    time_days=injection_days,
-    regime_name="injection_cycle_1",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Segundo ciclo de injeção
-injection_functions, injection_days = get_regime_snapshots(
-    p_snapshots,
-    days=[90, 100, 110, 119],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=injection_functions,
-    time_days=injection_days,
-    regime_name="injection_cycle_2",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Terceiro ciclo de injeção
-injection_functions, injection_days = get_regime_snapshots(
-    p_snapshots,
-    days=[180, 190, 200, 209],
-)
-plot_pressure_regime_2d(
-    pressure_functions=injection_functions,
-    time_days=injection_days,
-    regime_name="injection_cycle_3",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Quarto ciclo de injeção
-injection_functions, injection_days = get_regime_snapshots(
-    p_snapshots,
-    days=[270, 280, 290, 299],
-)
-plot_pressure_regime_2d(
-    pressure_functions=injection_functions,
-    time_days=injection_days,
-    regime_name="injection_cycle_4",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# ----------------------------------------------------------------
-# Regime de poços fechados
-# Stop - ciclo 1
-stop_functions, stop_days = get_regime_snapshots(
-    p_snapshots,
-    days=[30, 40, 50, 59],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=stop_functions,
-    time_days=stop_days,
-    regime_name="stop_cycle_1",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Stop - ciclo 2
-stop_functions, stop_days = get_regime_snapshots(
-    p_snapshots,
-    days=[120, 130, 140, 149],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=stop_functions,
-    time_days=stop_days,
-    regime_name="stop_cycle_2",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Stop - ciclo 3
-stop_functions, stop_days = get_regime_snapshots(
-    p_snapshots,
-    days=[210, 220, 230, 239],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=stop_functions,
-    time_days=stop_days,
-    regime_name="stop_cycle_3",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Stop - ciclo 4
-stop_functions, stop_days = get_regime_snapshots(
-    p_snapshots,
-    days=[300, 310, 320, 329],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=stop_functions,
-    time_days=stop_days,
-    regime_name="stop_cycle_4",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# ----------------------------------------------------------------
-# Regime de produção
-# Production - ciclo 1
-production_functions, production_days = get_regime_snapshots(
-    p_snapshots,
-    days=[60, 70, 80, 89],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=production_functions,
-    time_days=production_days,
-    regime_name="production_cycle_1",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Production - ciclo 2
-production_functions, production_days = get_regime_snapshots(
-    p_snapshots,
-    days=[150, 160, 170, 179],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=production_functions,
-    time_days=production_days,
-    regime_name="production_cycle_2",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Production - ciclo 3
-production_functions, production_days = get_regime_snapshots(
-    p_snapshots,
-    days=[240, 250, 260, 269],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=production_functions,
-    time_days=production_days,
-    regime_name="production_cycle_3",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# Production - ciclo 4
-production_functions, production_days = get_regime_snapshots(
-    p_snapshots,
-    days=[330, 340, 350, 359],
-)
-
-plot_pressure_regime_2d(
-    pressure_functions=production_functions,
-    time_days=production_days,
-    regime_name="production_cycle_4",
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# -------------------------------------------------------------------------
-# Mid-height transient profiles
-# ---------------------------------------------------------
-
-mid_height_functions = [
-    # Injection
-    p_snapshots[0],    # Day 1
-    p_snapshots[14],   # Day 15
-    p_snapshots[28],   # Day 29
-
-    # Stop
-    p_snapshots[29],   # Day 30
-    p_snapshots[44],   # Day 45
-    p_snapshots[58],   # Day 59
-
-    # Production
-    p_snapshots[59],   # Day 60
-    p_snapshots[74],   # Day 75
-    p_snapshots[88],   # Day 89
-]
-
-mid_height_days = [
-    1, 15, 29,
-    30, 45, 59,
-    60, 75, 89,
-]
-
-mid_height_regimes = [
-    "Injection", "Injection", "Injection",
-    "Stop", "Stop", "Stop",
-    "Production", "Production", "Production",
-]
-
-plot_mid_height_transient_profiles(
-    pressure_functions=mid_height_functions,
-    time_days=mid_height_days,
-    regime_names=mid_height_regimes,
-    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_2D,
-)
-
-# ---------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
+print("Máximo global de |U| =", global_velocity_max)
 
 """
 # Setting up the figure object
