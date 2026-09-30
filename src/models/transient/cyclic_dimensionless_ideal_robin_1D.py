@@ -1,5 +1,4 @@
 """
-Trabalho Final — Disciplina: GA 033 - Elementos Finitos
 Tema: Escoamento monofásico compressível de gás ideal em meio poroso (1D)
 Formulação variacional com Firedrake
 
@@ -17,12 +16,6 @@ Admite-se que:
 A equação governante considerada é:
 
     φ ∂p/∂t = (k/μ) ∂/∂x ( p ∂p/∂x )
-
-onde:
-    p   = pressão
-    φ   = porosidade
-    k   = permeabilidade
-    μ   = viscosidade do fluido
 
 Condições de contorno:
     Condição de Robin na fronteira do poço injetor e produtor:
@@ -42,6 +35,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from src.utils.paths import FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
+from src.plotting.simulations.plot_1d import (
+    plot_pressure_1d,
+    plot_pressure_regime_1d,
+    # plot_mid_height_transient_profiles,
+    # plot_velocity_1d,
+    # plot_velocity_regime_1d
+)
 
 # Mesh definition
 numel = 100 # mudei de 200 para 100 (!!!)
@@ -202,56 +202,11 @@ while T <= T_total:
 )
 
 
-
-
-
-
     # ===== Pós-processamento da velocidade (TRANSIENTE) =====
     # u_expr = -(kappa / mu) * p.dx(0)    # OBSERVAÇÃO: NÃO ESTÁ ADMENSIONALIZADA AINDA
     u_expr =  -p.dx(0)  # adimensionalized Darcy velocity
     u.project(u_expr)
-
-
-    # -----
-    # teste
-    """
-    if operation_mode(T) == "injection":
-        dPdx = Function(V_u)
-        dPdx.project(p.dx(0))
-
-        dPdx_left = dPdx.dat.data_ro[0]
-
-        P_left = p.dat.data_ro[0]
-
-        robin_left = float(Gamma_left) * (
-            P_left - float(p_injection_left)
-        )
-
-        print(
-            f"Robin left: "
-            f"P_x={dPdx_left:.6f}, "
-            f"Gamma(P-Pw)={robin_left:.6f}, "
-            f"erro={dPdx_left - robin_left:.2e}"
-        )
-    """
-    """
-    if operation_mode(T) == "production":
-        dPdx = Function(V_u)
-        dPdx.project(p.dx(0))
-        dPdx_right = dPdx.dat.data_ro[-1]
-        P_right = p.dat.data_ro[-1]
-
-        robin_right = float(Gamma_right) * (
-            P_right - float(p_production_right)
-        )
-
-        print(
-            f"Robin right: "
-            f"-P_x={-dPdx_right:.6f}, "
-            f"Gamma(P-Pw)={robin_right:.6f}, "
-            f"erro={-dPdx_right - robin_right:.2e}"
-        )
-    """
+    
 
     # -----
     u_vals = u.dat.data_ro.copy()  # representa U adimensional 
@@ -275,45 +230,46 @@ while T <= T_total:
 
 print("Number of stored solutions:", len(p_values_deg1))
 
+# ==================================
 # *** Plotting ***
 
-# Setting up the figure object
-fig = plt.figure(dpi=300, figsize=(8, 6))
-ax = plt.subplot(111)
-
-# Plotting the data
-steps_to_plot = [1, 5, 10, 20, 50, 100, 200, 300, 350]  
-# steps_to_plot = [1, 10, 20, 29, 30,40, 50, 59, 60,70, 80, 89, 90]
-
-# X_values = x_values / L
-for i in steps_to_plot:
-    time_days = i
-    ax.plot(x_values, p_values_deg1[i-1], label=f"t = {time_days} days")
-
-# Getting and setting the legend
-box = ax.get_position()
-ax.set_position([box.x0, box.y0, 1.05 * box.width, box.height])
-ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
-
-# Setting the xy-labels
-plt.xlabel(r'$X$ ')
-plt.ylabel(r'Pressure')
-plt.xlim(x_values.min(), x_values.max())
-
-# Setting the grids in the figure
-plt.minorticks_on()
-plt.grid(True)
-plt.grid(False, linestyle='--', linewidth=0.5, which='major')
-plt.grid(False, linestyle='--', linewidth=0.1, which='minor')
-
-# Displaying the plot
-plt.tight_layout()
-plt.savefig(FIGURES_SIM_IDEAL_TRANSIENT_ROBIN / "cyclic-dimensionless-ideal-transient-robin-pressure.png")
-    
-#plt.show()
+plot_pressure_1d(
+    x_values=x_values,
+    pressure_values=p_values_deg1,
+    time_steps=[1, 5, 10, 20, 50, 100, 200, 300, 350],
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN,
+)
 
 # ============================================================
+# Pressão separada por regime
+
+pressure_regime_days = [
+    1, 10, 20, 29,
+    30, 40, 50, 59,
+    60, 70, 80, 89,
+]
+
+pressure_regime_names = [
+    "injection", "injection", "injection", "injection",
+    "stop", "stop", "stop", "stop",
+    "production", "production", "production", "production",
+]
+
+pressure_regime_values = [
+    p_values_deg1[day - 1]
+    for day in pressure_regime_days
+]
+
+plot_pressure_regime_1d(
+    pressure_values=pressure_regime_values,
+    x_values=x_values,
+    time_days=pressure_regime_days,
+    regime_names=pressure_regime_names,
+    figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN,
+)
+# ============================================================
 # Comparação: 
+"""
 steps_to_compare = [1, 50, 100]
 
 
@@ -413,4 +369,4 @@ fig.tight_layout()
 fig.savefig(
     FIGURES_SIM_IDEAL_TRANSIENT_ROBIN
     / "cyclic-dimensionless-ideal-transient-robin-velocity.png"
-)
+) """
