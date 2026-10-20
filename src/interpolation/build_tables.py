@@ -6,10 +6,11 @@
 
 import numpy as np
 # from src.properties.coolprop_model import calculate_Z, calculate_density, calculate_viscosity 
-from src.properties.neqsim_model import calculate_Z, calculate_density, calculate_viscosity 
+# from src.properties.neqsim_model import calculate_Z, calculate_density, calculate_viscosity 
 # from src.properties.thermo_model import calculate_Z, calculate_density, calculate_viscosity 
 # from src.properties.thermo_pr_model import calculate_Z, calculate_density, calculate_viscosity 
-# from src.properties.thermopack_model import calculate_Z, calculate_density, calculate_viscosity 
+# from src.properties.thermopack_model import calculate_Z, calculate_density, calculate_viscosity
+from src.properties.torch_flash_model import calculate_Z, calculate_density, calculate_viscosity 
 
 
 from src.interpolation.grid import create_grid
