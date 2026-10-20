@@ -1,39 +1,72 @@
+# torch_flash_model.py
+"""Propriedades termodinâmicas do hidrogênio usando torch-flash.
+
+Z: equação de estado de Leachman.
+Viscosidade: modelo de estados correspondentes de Pedersen.
+
+Entradas:
+    P: pressão em Pa
+    T: temperatura em K
+
+Saídas:
+    Z: fator de compressibilidade
+    densidade: kg/m³
+    viscosidade: Pa·s
+"""
+
 import torch
-
 from torch_flash import (
-    ChemicalState,
     component_set,
-    configure,
-    peng_robinson_1978,
-    phase_properties,
-    state_derivatives,
-    two_phase_flash,
+    leachman_normal_hydrogen,
+    corresponding_states_viscosity,
 )
 
-runtime = configure(device="cpu", dtype=torch.float64)
-model = peng_robinson_1978(component_set(("methane", "n_butane")))
-state = ChemicalState(
-    temperature=runtime.tensor(270.0),       # K
-    pressure=runtime.tensor(3.0e6),          # Pa
-    composition=runtime.tensor([0.5, 0.5]),  # mole fractions
-)
 
-# Evaluate the supplied homogeneous state without solving an equilibrium.
-properties = phase_properties(model, state, phase="stable")
-print(properties.compressibility_factor)
-print(properties.fugacities, properties.log_fugacities)
-print(properties.chemical_potentials)
-print(properties.molar_helmholtz_energy, properties.molar_gibbs_energy)
-print(properties.reduced_helmholtz_energy, properties.reduced_gibbs_energy)
+DTYPE = torch.float64
 
-# Derivatives are evaluated with PyTorch automatic differentiation.
-derivatives = state_derivatives(model, state)
-print(derivatives.dfugacity_dpressure)
-print(derivatives.dchemical_potential_dtemperature)
+# Equação de estado de Leachman para hidrogênio normal.
+EOS = leachman_normal_hydrogen(dtype=DTYPE)
 
-# Stability-tested two-phase TP flash.
-equilibrium = two_phase_flash(model, state)
-print(equilibrium.phase_fractions)
-print(equilibrium.phase_kinds, equilibrium.phase_regime)
-for phase in equilibrium.phases:
-    print(phase.composition)
+# Componente puro usado no cálculo da viscosidade.
+COMPONENTS = component_set(("hydrogen",))
+COMPOSITION = torch.tensor([1.0], dtype=DTYPE)
+
+MOLAR_MASS = COMPONENTS.molar_mass[0]
+
+
+def calculate_Z(P, T):
+    """Calcula o fator de compressibilidade do hidrogênio."""
+    pressure = torch.as_tensor(P, dtype=DTYPE)
+    temperature = torch.as_tensor(T, dtype=DTYPE)
+
+    molar_volume = EOS.molar_volume(temperature, pressure)
+    Z = EOS.compressibility_factor(temperature, molar_volume)
+
+    return Z.item()
+
+
+def calculate_density(P, T):
+    """Calcula a densidade do hidrogênio em kg/m³."""
+    pressure = torch.as_tensor(P, dtype=DTYPE)
+    temperature = torch.as_tensor(T, dtype=DTYPE)
+
+    molar_volume = EOS.molar_volume(temperature, pressure)
+    density = MOLAR_MASS / molar_volume
+
+    return density.item()
+
+
+def calculate_viscosity(P, T):
+    """Calcula a viscosidade dinâmica do hidrogênio em Pa·s."""
+    pressure = torch.as_tensor(P, dtype=DTYPE)
+    temperature = torch.as_tensor(T, dtype=DTYPE)
+
+    viscosity = corresponding_states_viscosity(
+        temperature=temperature,
+        pressure=pressure,
+        composition=COMPOSITION,
+        components=COMPONENTS,
+        phase="vapor",
+    )
+
+    return viscosity.item()
