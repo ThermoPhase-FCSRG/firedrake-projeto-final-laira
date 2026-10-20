@@ -50,6 +50,13 @@ from src.properties.neqsim_model import (
     calculate_viscosity as mu_neq
 )
 
+# torch-flash
+from src.properties.torch_flash_model import (
+    calculate_Z as Z_tf,
+    calculate_density as rho_tf,
+    calculate_viscosity as mu_tf
+)
+
 # plots
 from src.plotting.properties.plot_z import (
     plot_Z_vs_pressure, 
@@ -72,6 +79,7 @@ from src.plotting.properties.plot_viscosity import (
 
 
 
+
 # parâmetros
 T = 300  # temperatura em K
 P = 1e7  # 100 bar = 10 MPa = 1e7 Pa 
@@ -83,7 +91,8 @@ Z_models = {
     "Thermo": Z_th,
     "Thermo_PR": Z_pr,
     "Thermopack": Z_tp,
-    "NeqSim": z_neq
+    "NeqSim": z_neq,
+    "Torch-Flash": Z_tf
 }
 
 density_models = {
@@ -91,13 +100,15 @@ density_models = {
     "Thermo": rho_th_func,
     "Thermo_PR": rho_pr_func,
     "Thermopack": rho_tp_func,
-    "NeqSim": rho_neq
+    "NeqSim": rho_neq,
+    "Torch-Flash": rho_tf
 }
 
 viscosity_models = {
     "CoolProp": mu_cp,
     "Thermo": mu_th,
-    "NeqSim": mu_neq
+    "NeqSim": mu_neq,
+    "Torch-Flash": mu_tf
 }
 
 # ===================
