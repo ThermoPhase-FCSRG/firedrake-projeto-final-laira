@@ -206,12 +206,12 @@ while T <= T_total:
     update_well_pressures(T)
     solve(F == 0, p, solver_parameters=solver_parameters)
     
-
+    """
     print(
     f"day={step:3d}, mode={operation_mode(T)}, "
     f"P_left={p.dat.data_ro[0]:.6f}, "
     f"P_right={p.dat.data_ro[-1]:.6f}"
-)
+    )"""
 
 
     # ===== Pós-processamento da velocidade (TRANSIENTE) =====
@@ -241,6 +241,25 @@ while T <= T_total:
     T += dT
 
 print("Number of stored solutions:", len(p_values_deg1))
+
+# ============================================================
+# Análise da pressão média durante o fechamento dos poços
+
+days_to_check = [30, 40, 100, 200, 350, 550, 719]
+
+print("\nPressão média durante o regime STOP:")
+print("-" * 45)
+
+for day in days_to_check:
+    pressure = p_values_deg1[day - 1]
+
+    # Média espacial da pressão adimensional
+    mean_pressure = np.mean(pressure)
+
+    print(
+        f"Dia {day:3d}: "
+        f"P_média = {mean_pressure:.8f}"
+    )
 
 # ==================================
 # *** Plotting ***
