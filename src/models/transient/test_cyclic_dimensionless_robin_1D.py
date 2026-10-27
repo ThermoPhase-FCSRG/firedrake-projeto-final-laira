@@ -247,9 +247,10 @@ plot_pressure_1d(
     x_values=x_values,
     pressure_values=p_values_deg1,
     time_steps=[
-    1, 10, 20, 29,
-    30, 40,
-    100, 350, 719,
+        1, 15, 29,       # Injeção
+        30, 40,          # Início do fechamento
+        100, 200, 350,   # Redistribuição da pressão
+        550, 719,        # Aproximação do equilíbrio
 ],
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_1D_TEST,
 )
@@ -258,18 +259,17 @@ plot_pressure_1d(
 # Pressão separada por regime
 
 pressure_regime_days = [
-    1, 10, 20, 29,
-    30, 40,
-    100, 350, 719,
+        1, 15, 29,       # Injeção
+        30, 40,          # Início do fechamento
+        100, 200, 350,   # Redistribuição da pressão
+        550, 719,        # Aproximação do equilíbrio
 ]
 
 pressure_regime_names = [
-    "Test - injection", "Test - injection",
-    "Test - injection", "Test - injection",
-    "Test - stop", "Test - stop",
-    "Test - stop", "Test - stop",
-    "Test - stop", "Test - stop",
-    "Test - stop", "Test - stop",
+    "injection", "injection", "injection",
+    "stop", "stop",
+    "stop", "stop", "stop",
+    "stop", "stop",
 ]
 
 pressure_regime_values = [
@@ -299,9 +299,10 @@ plot_velocity_1d(
     x_values=x_cells,
     velocity_values=u_time_series,
     time_steps=[
-    1, 10, 20, 29,
-    30, 40,
-    100, 350, 719,
+        1, 15, 29,       # Injeção
+        30, 40,          # Início do fechamento
+        100, 200, 350,   # Redistribuição da pressão
+        550, 719,        # Aproximação do equilíbrio
 ],
     figures_directory=FIGURES_SIM_IDEAL_TRANSIENT_ROBIN_1D_TEST,
 )
