@@ -27,6 +27,8 @@ Condição inicial:
 A discretização espacial é realizada pelo Método dos Elementos Finitos
 utilizando elementos de Lagrange contínuos (CG),
 e a discretização temporal é feita via esquema implícito de Euler.
+
+teste com o poço injetor aberto durante 30 dias e depois tudo fechado
 """
 
 # Importing libraries
