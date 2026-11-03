@@ -244,23 +244,50 @@ print("Number of stored solutions:", len(p_values_deg1))
 
 # ============================================================
 # Análise da pressão média durante o fechamento dos poços
-
 days_to_check = [30, 40, 100, 200, 350, 550, 719]
 
 print("\nPressão média durante o regime STOP:")
 print("-" * 45)
+""" Estte código soma a pressão de cada ponto da malha e divide pelo número de pontos.
+É como se todos os pontos tivessem a mesma importância, inclusive os das extremidades."""
 
 for day in days_to_check:
     pressure = p_values_deg1[day - 1]
 
     # Média espacial da pressão adimensional
     mean_pressure = np.mean(pressure)
-
     print(
-        f"Dia {day:3d}: "
-        f"P_média = {mean_pressure:.8f}"
-    )
+            f"Dia {day}: "
+            f"mínima = {np.min(pressure):.8f}, "
+            f"máxima = {np.max(pressure):.8f}, "
+            f"média = {mean_pressure:.8f}"
+        )
 
+
+# Análise da pressão média durante o fechamento dos poços com integral 
+# 1/L * integral P/dx 
+days_to_check = [30, 40, 100, 200, 350, 550, 719]
+print("\nPressão média (com integral) durante o regime STOP:")
+print("-" * 45)
+
+for day in days_to_check:
+    pressure = p_values_deg1[day - 1]
+
+    mean_pressure = np.trapezoid(
+        pressure, x_values
+    ) / (x_values[-1] - x_values[0])
+
+    
+    print(
+                f"Dia {day}: "
+                f"mínima = {np.min(pressure):.8f}, "
+                f"máxima = {np.max(pressure):.8f}, "
+                f"média = {mean_pressure:.8f}"
+            )
+
+
+
+    
 # ==================================
 # *** Plotting ***
 
