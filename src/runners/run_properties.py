@@ -1,6 +1,4 @@
 """
-run_properties.py
-
 Gera gráficos de propriedades termodinâmicas do hidrogênio para comparação entre modelos.
 
 Rodar com:
@@ -50,11 +48,18 @@ from src.properties.neqsim_model import (
     calculate_viscosity as mu_neq
 )
 
-# torch-flash
+# torch-flash Leachmen
 from src.properties.torch_flash_model import (
     calculate_Z as Z_tf,
     calculate_density as rho_tf,
     calculate_viscosity as mu_tf
+)
+
+# torch-flash PR
+from src.properties.torch_flash_PR_model import (
+    calculate_Z as Z_tf_pr,
+    calculate_density as rho_tf_pr,
+    calculate_viscosity as mu_tf_pr
 )
 
 # plots
@@ -92,7 +97,8 @@ Z_models = {
     "Thermo_PR": Z_pr,
     "Thermopack": Z_tp,
     "NeqSim": z_neq,
-    "Torch-Flash": Z_tf
+    "Torch-Flash": Z_tf,
+    "Torch-Flash_PR": Z_tf_pr
 }
 
 density_models = {
@@ -101,14 +107,16 @@ density_models = {
     "Thermo_PR": rho_pr_func,
     "Thermopack": rho_tp_func,
     "NeqSim": rho_neq,
-    "Torch-Flash": rho_tf
+    "Torch-Flash": rho_tf,
+    "Torch-Flash_PR": rho_tf_pr
 }
 
 viscosity_models = {
     "CoolProp": mu_cp,
     "Thermo": mu_th,
     "NeqSim": mu_neq,
-    "Torch-Flash": mu_tf
+    "Torch-Flash": mu_tf,
+    "Torch-Flash_PR": mu_tf_pr
 }
 
 # ===================
