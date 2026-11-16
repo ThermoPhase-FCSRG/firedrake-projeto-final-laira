@@ -1,4 +1,5 @@
 # src/models/neqsim_model.py
+# 
 
 from neqsim.thermo import fluid, TPflash   # TPflash resolve o equilíbrio em T e P. e fluid cria um sistema termodinâmico (mistura + EOS)
 
@@ -33,6 +34,13 @@ def _prepare_fluid(P, T):
 
     # inicializa propriedades físicas de transporte (viscosidade, condutividade, difusividade)
     fl.initPhysicalProperties()
+
+    phase = fl.getPhase(0)
+    physical_properties = phase.getPhysicalProperties()
+    physical_properties.setViscosityModel("Muzny") # Seleciona explicitamente a correlação de viscosidade de Muzny
+
+    # Recalcula as propriedades físicas com o novo modelo
+    phase.initPhysicalProperties()
 
     return fl
 
