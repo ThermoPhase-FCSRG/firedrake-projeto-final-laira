@@ -29,3 +29,12 @@ def calculate_viscosity(P, T):
     fluid.T = T
     fluid.P = P
     return fluid.mu
+
+c = Chemical('hydrogen', T=300, P=20e6)
+
+print("Vm:", c.Vmg)
+print("Vm ideal:", c.Vmg_ideal)
+print("Método:", c.VolumeGas.method)
+print("Métodos:", c.VolumeGas.all_methods)
+print("Método de pressão:", c.VolumeGas.method_P)
+print("Z:", c.Z)
