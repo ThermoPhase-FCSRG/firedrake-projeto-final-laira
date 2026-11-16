@@ -8,7 +8,7 @@ import numpy as np
 # Inicializando modelo Peng-Robinson
 eos = PengRobinson("H2")  # fluido (H2)
 z_comp = [1.0]  # Composição: hidrogênio puro
-PHASE_GAS = 1   # Fase: 1 = vapor
+PHASE_GAS = eos.VAPPH   # Fase vapor
 
 # Constantes
 M_H2 = 2.016e-3  # kg/mol   # massa molar do hidrogênio
