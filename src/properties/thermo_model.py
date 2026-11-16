@@ -2,7 +2,6 @@
 
 from thermo import Chemical
 
-# usando Peng-Robinson 
 
 # Criar objeto do fluido
 fluid = Chemical('hydrogen')
