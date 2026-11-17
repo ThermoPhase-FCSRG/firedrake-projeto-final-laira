@@ -119,6 +119,33 @@ viscosity_models = {
     "Torch-Flash_PR": mu_tf_pr
 }
 
+# =========================
+# NOMES DOS MODELOS PARA Z E DENSIDADE
+# =========================
+model_labels = {
+    "CoolProp": "CoolProp (Leachman)",
+    "Thermo": "Thermo (Chemical - Ideal Gas)",
+    "Thermo_PR": "Thermo (PR)",
+    "Thermopack": "Thermopack (PR)",
+    "NeqSim": "NeqSim (PR)",
+    "Torch-Flash": "Torch-Flash (Leachman)",
+    "Torch-Flash_PR": "Torch-Flash (PR)"
+}
+
+# =========================
+# MODELOS DE VISCOSIDADE
+# =========================
+
+viscosity_labels = {
+    "CoolProp": "CoolProp (Muzny)",
+    "Thermo": "Thermo (REFPROP_FIT)",
+    "NeqSim": "NeqSim (Muzny)",
+    "Torch-Flash": "Torch-Flash (Pedersen)",
+    "Torch-Flash_PR": "Torch-Flash_PR (Pedersen)"
+}
+
+
+
 # ===================
 
 print("=== Comparação de densidade ===")
@@ -158,13 +185,13 @@ for name, func in viscosity_models.items():
 
 # =========================
 # PLOTS COMPARAÇÕES
-plot_Z_vs_pressure_comparison(Z_models, T)
-plot_Z_vs_temperature_comparison(Z_models, P)
-plot_density_vs_pressure_comparison(density_models, T)
-plot_density_vs_temperature_comparison(density_models, P)
-plot_density_vs_Z_comparison(density_models, Z_models, T)
-plot_viscosity_vs_pressure_comparison(viscosity_models, T)
-plot_viscosity_vs_temperature_comparison(viscosity_models, P)
+plot_Z_vs_pressure_comparison(Z_models, T, labels=model_labels)
+plot_Z_vs_temperature_comparison(Z_models, P, labels=model_labels)
+plot_density_vs_pressure_comparison(density_models, T, labels=model_labels)
+plot_density_vs_temperature_comparison(density_models, P, labels=model_labels)
+plot_density_vs_Z_comparison(density_models, Z_models, T, labels=model_labels)
+plot_viscosity_vs_pressure_comparison(viscosity_models, T, labels=viscosity_labels)
+plot_viscosity_vs_temperature_comparison(viscosity_models, P, labels=viscosity_labels)
 
 """
 rho_v = density_via_volume(P, T)

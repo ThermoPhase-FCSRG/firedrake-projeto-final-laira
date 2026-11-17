@@ -2,6 +2,36 @@ import numpy as np
 import matplotlib.pyplot as plt
 from src.utils.paths import FIGURES_PROP_DENSITY
 
+LINESTYLES = {
+    "CoolProp": "-",
+    "Thermo": "-",
+    "Thermo_PR": (0, (8, 2)),
+    "Thermopack": (0, (2, 2)),
+    "NeqSim": "-.",
+    "Torch-Flash": "--",
+    "Torch-Flash_PR": (0, (8, 2, 2, 2))
+}
+
+MARKERS = {
+    "CoolProp": "o",
+    "Thermo": None,
+    "Thermo_PR": "D",
+    "Thermopack": "v",
+    "NeqSim": "^",
+    "Torch-Flash": "s",
+    "Torch-Flash_PR": "X"
+}
+
+MARKEVERY = {
+    "CoolProp": (0, 12),
+    "Thermo": None,
+    "Thermo_PR": (2, 12),
+    "Thermopack": (5, 12),
+    "NeqSim": (3, 12),
+    "Torch-Flash": (7, 12),
+    "Torch-Flash_PR": (9, 12)
+}
+
 def plot_density_vs_pressure(model_function, T, model_name):
     """
     Gráfico densidade vs pressão (T fixa)
@@ -54,7 +84,6 @@ def plot_density_vs_temperature(model_function, P, model_name):
 
     plt.close()    
 
-
 def plot_density_vs_Z(model_density, model_Z, T, model_name):
     """
     Gráfico densidade vs Z (variando pressão)
@@ -89,7 +118,7 @@ def plot_density_vs_Z(model_density, model_Z, T, model_name):
 
 
 
-def plot_density_vs_pressure_comparison(models, T):
+def plot_density_vs_pressure_comparison(models, T, labels=None):
     """
     Compara densidade vs Pressão para múltiplos modelos (T fixa)
     """
@@ -105,7 +134,19 @@ def plot_density_vs_pressure_comparison(models, T):
             rho = model_function(P, T)
             densities.append(rho)
 
-        plt.plot(pressures_MPa, densities, label=model_name)
+        legend_label = labels.get(model_name, model_name) if labels else model_name
+
+        plt.plot(
+            pressures_MPa,
+            densities,
+            label=legend_label,
+            linestyle=LINESTYLES.get(model_name, "-"),
+            marker=MARKERS.get(model_name),
+            markevery=MARKEVERY.get(model_name),
+            markersize=5,
+            markerfacecolor="white",
+            linewidth=1.8
+        )
 
     plt.xlabel("Pressão (MPa)")
     plt.ylabel("Densidade (kg/m³)")
@@ -117,7 +158,7 @@ def plot_density_vs_pressure_comparison(models, T):
     plt.savefig(FIGURES_PROP_DENSITY / "density_vs_P_comparison.png", dpi=300)
     plt.close()
 
-def plot_density_vs_temperature_comparison(models, P):
+def plot_density_vs_temperature_comparison(models, P, labels=None):
     """
     Compara densidade vs Temperatura para múltiplos modelos (P fixa)
     """
@@ -132,7 +173,19 @@ def plot_density_vs_temperature_comparison(models, P):
             rho = model_function(P, T)
             densities.append(rho)
 
-        plt.plot(temperatures, densities, label=model_name)
+        legend_label = labels.get(model_name, model_name) if labels else model_name
+
+        plt.plot(
+            temperatures,
+            densities,
+            label=legend_label,
+            linestyle=LINESTYLES.get(model_name, "-"),
+            marker=MARKERS.get(model_name),
+            markevery=MARKEVERY.get(model_name),
+            markersize=5,
+            markerfacecolor="white",
+            linewidth=1.8
+        )
 
     plt.xlabel("Temperatura (K)")
     plt.ylabel("Densidade (kg/m³)")
@@ -146,7 +199,7 @@ def plot_density_vs_temperature_comparison(models, P):
 
 
 
-def plot_density_vs_Z_comparison(density_models, Z_models, T):
+def plot_density_vs_Z_comparison(density_models, Z_models, T, labels=None):
     """
     Compara densidade vs Z para múltiplos modelos (T fixa)
     """
@@ -164,14 +217,25 @@ def plot_density_vs_Z_comparison(density_models, Z_models, T):
         Z_function = Z_models[model_name]
 
         for P in pressures:
-
             rho = density_function(P, T)
             Z = Z_function(P, T)
 
             densities.append(rho)
             Z_values.append(Z)
 
-        plt.plot(Z_values, densities, label=model_name)
+        legend_label = labels.get(model_name, model_name) if labels else model_name
+
+        plt.plot(
+            Z_values,
+            densities,
+            label=legend_label,
+            linestyle=LINESTYLES.get(model_name, "-"),
+            marker=MARKERS.get(model_name),
+            markevery=MARKEVERY.get(model_name),
+            markersize=5,
+            markerfacecolor="white",
+            linewidth=1.8
+        )
 
     plt.xlabel("Fator de compressibilidade (Z)")
     plt.ylabel("Densidade (kg/m³)")
